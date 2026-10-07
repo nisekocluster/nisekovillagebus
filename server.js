@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const jwt      = require('jsonwebtoken');
 const cors     = require('cors');
 const path     = require('path');
+const fs       = require('fs');
 
 const app  = express();
 const pool = new Pool({ 
@@ -318,7 +319,7 @@ app.delete('/api/trash', requireAuth, requireMaster, async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════
 // ANALYTICS (simple — no cookies, no IPs stored)
 // ══════════════════════════════════════════════════════════════════════════
-pool.query(`
+const ANALYTICS_SQL = `
   CREATE TABLE IF NOT EXISTS analytics_events (
     id         SERIAL PRIMARY KEY,
     event      TEXT NOT NULL,
@@ -327,7 +328,7 @@ pool.query(`
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
   CREATE INDEX IF NOT EXISTS analytics_events_created_idx ON analytics_events (created_at);
-`).catch(e => console.error('analytics table:', e.message));
+`;
 
 const TRACK_EVENTS  = new Set(['visit', 'book_click', 'form_start']);
 const TRACK_LANGS   = new Set(['en', 'ja', 'ko', 'zh']);
@@ -481,4 +482,21 @@ app.get('*', (req, res) => {
   res.status(404).send('Not found');
 });
 
-app.listen(PORT, () => console.log(`NVBus API running on port ${PORT}`));
+// ── Startup: make sure all tables exist, then start listening ─────────────
+// schema.sql only uses CREATE ... IF NOT EXISTS → safe to run on every boot,
+// never deletes or changes existing data.
+async function initDb() {
+  const schemaPath = path.join(__dirname, 'schema.sql');
+  if (fs.existsSync(schemaPath)) {
+    await pool.query(fs.readFileSync(schemaPath, 'utf8'));
+    console.log('Schema OK');
+  } else {
+    console.warn('schema.sql not found next to server.js — skipping table creation');
+  }
+  await pool.query(ANALYTICS_SQL);
+  console.log('Analytics table OK');
+}
+
+initDb()
+  .catch(e => console.error('DB init error:', e.message))
+  .finally(() => app.listen(PORT, () => console.log(`NVBus API running on port ${PORT}`)));
