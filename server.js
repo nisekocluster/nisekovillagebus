@@ -15,15 +15,19 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const PORT       = process.env.PORT || 3000;
 
 if (!JWT_SECRET) throw new Error('Missing env var: JWT_SECRET');
-if (!process.env.PASS_NISEKO) throw new Error('Missing env var: PASS_NISEKO');
-if (!process.env.PASS_RITZ)   throw new Error('Missing env var: PASS_RITZ');
-if (!process.env.PASS_MOXY)   throw new Error('Missing env var: PASS_MOXY');
+for (const v of ['PASS_SUPERADMIN', 'PASS_STAFF', 'PASS_MOXY', 'PASS_RITZ']) {
+  if (!process.env[v]) throw new Error(`Missing env var: ${v}`);
+}
 
 // ── Users — credentials loaded exclusively from Railway environment variables ──
+//   superadmin → everything (incl. Analytics + Settings)
+//   staff      → everything except Analytics + Settings
+//   hotel      → only its own hotel (reservations, cancellations, history, trash)
 const USERS = {
-  nisekovillage: { pass: process.env.PASS_NISEKO, role: 'master', label: 'Niseko Village',   hotelFilter: null },
-  nvmoxy:        { pass: process.env.PASS_MOXY,   role: 'hotel',  label: 'Moxy',             hotelFilter: 'Moxy' },
-  nvritz:        { pass: process.env.PASS_RITZ,   role: 'hotel',  label: 'The Ritz-Carlton', hotelFilter: 'Ritz-Carlton Reserve' },
+  superadmin: { pass: process.env.PASS_SUPERADMIN, role: 'superadmin', label: 'Super Admin',      hotelFilter: null },
+  nvstaff:    { pass: process.env.PASS_STAFF,      role: 'staff',      label: 'NV Staff',         hotelFilter: null },
+  nvmoxy:     { pass: process.env.PASS_MOXY,       role: 'hotel',      label: 'Moxy',             hotelFilter: 'Moxy' },
+  nvritz:     { pass: process.env.PASS_RITZ,       role: 'hotel',      label: 'The Ritz-Carlton', hotelFilter: 'Ritz-Carlton Reserve' },
 };
 
 // ── Middleware ─────────────────────────────────────────────────────────────
@@ -44,14 +48,22 @@ function requireAuth(req, res, next) {
   }
 }
 
-function requireMaster(req, res, next) {
-  if (req.user.role !== 'master') return res.status(403).json({ error: 'Forbidden' });
+function requireSuperadmin(req, res, next) {
+  if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Forbidden' });
   next();
 }
 
 // Apply hotel filter to queries — hotel role users only see their hotel
 function hotelFilter(req) {
   return req.user.hotelFilter || null;
+}
+
+// Adds " AND hotel = $n" for hotel roles (pushes the value into params); '' otherwise
+function hotelScope(req, params) {
+  const h = hotelFilter(req);
+  if (!h) return '';
+  params.push(h);
+  return ` AND hotel = $${params.length}`;
 }
 
 // ── POST /api/auth ─────────────────────────────────────────────────────────
@@ -148,11 +160,13 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
     }
     if (!sets.length) return res.status(400).json({ error: 'No fields to update' });
 
+    if (hotel && 'hotel' in r && r.hotel !== hotel) return res.status(403).json({ error: 'Forbidden' });
     params.push(req.params.id);
-    const hotelClause = hotel ? `AND hotel = '${hotel.replace(/'/g,"''")}'` : '';
+    const idIdx = params.length;
+    const scope = hotelScope(req, params);
     const { rows } = await pool.query(
       `UPDATE reservations SET ${sets.join(', ')}, updated_at = NOW()
-       WHERE id = $${params.length} ${hotelClause} AND trashed_at IS NULL RETURNING *`,
+       WHERE id = $${idIdx}${scope} AND trashed_at IS NULL RETURNING *`,
       params
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
@@ -161,29 +175,34 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
 });
 
 // DELETE /api/reservations/:id  → move to trash
-app.delete('/api/reservations/:id', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/reservations/:id', requireAuth, async (req, res) => {
   try {
+    const params = [req.params.id];
+    const scope = hotelScope(req, params);
     await pool.query(
-      `UPDATE reservations SET trashed_at = NOW() WHERE id = $1 AND trashed_at IS NULL`,
-      [req.params.id]
+      `UPDATE reservations SET trashed_at = NOW() WHERE id = $1${scope} AND trashed_at IS NULL`,
+      params
     );
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
 
 // POST /api/reservations/confirm-all  (master only)
-app.post('/api/reservations/confirm-all', requireAuth, requireMaster, async (req, res) => {
+app.post('/api/reservations/confirm-all', requireAuth, async (req, res) => {
   try {
+    const params = [];
+    const scope = hotelScope(req, params);
     const { rowCount } = await pool.query(
       `UPDATE reservations SET status = 'confirmed', updated_at = NOW()
-       WHERE status = 'pending' AND trashed_at IS NULL`
+       WHERE status = 'pending' AND trashed_at IS NULL${scope}`,
+      params
     );
     res.json({ confirmed: rowCount });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
 
 // DELETE /api/reservations  → delete all (master only, used in settings)
-app.delete('/api/reservations', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/reservations', requireAuth, requireSuperadmin, async (req, res) => {
   try {
     await pool.query(`UPDATE reservations SET trashed_at = NOW() WHERE trashed_at IS NULL`);
     res.json({ ok: true });
@@ -234,8 +253,10 @@ app.patch('/api/cancellations/:id', requireAuth, async (req, res) => {
     }
     if (!sets.length) return res.status(400).json({ error: 'No fields to update' });
     params.push(req.params.id);
+    const idIdx = params.length;
+    const scope = hotelScope(req, params);
     const { rows } = await pool.query(
-      `UPDATE cancellations SET ${sets.join(', ')} WHERE id = $${params.length} AND trashed_at IS NULL RETURNING *`,
+      `UPDATE cancellations SET ${sets.join(', ')} WHERE id = $${idIdx}${scope} AND trashed_at IS NULL RETURNING *`,
       params
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
@@ -244,18 +265,20 @@ app.patch('/api/cancellations/:id', requireAuth, async (req, res) => {
 });
 
 // DELETE /api/cancellations/:id  → move to trash
-app.delete('/api/cancellations/:id', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/cancellations/:id', requireAuth, async (req, res) => {
   try {
+    const params = [req.params.id];
+    const scope = hotelScope(req, params);
     await pool.query(
-      `UPDATE cancellations SET trashed_at = NOW() WHERE id = $1 AND trashed_at IS NULL`,
-      [req.params.id]
+      `UPDATE cancellations SET trashed_at = NOW() WHERE id = $1${scope} AND trashed_at IS NULL`,
+      params
     );
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
 
 // DELETE /api/cancellations  → delete all (master only)
-app.delete('/api/cancellations', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/cancellations', requireAuth, requireSuperadmin, async (req, res) => {
   try {
     await pool.query(`UPDATE cancellations SET trashed_at = NOW() WHERE trashed_at IS NULL`);
     res.json({ ok: true });
@@ -267,11 +290,13 @@ app.delete('/api/cancellations', requireAuth, requireMaster, async (req, res) =>
 // ══════════════════════════════════════════════════════════════════════════
 
 // GET /api/trash
-app.get('/api/trash', requireAuth, requireMaster, async (req, res) => {
+app.get('/api/trash', requireAuth, async (req, res) => {
   try {
+    const params = [];
+    const scope = hotelScope(req, params);
     const [res1, can1] = await Promise.all([
-      pool.query(`SELECT *, 'reservation' AS _trash_type FROM reservations WHERE trashed_at IS NOT NULL ORDER BY trashed_at DESC`),
-      pool.query(`SELECT *, 'cancellation' AS _trash_type FROM cancellations WHERE trashed_at IS NOT NULL ORDER BY trashed_at DESC`),
+      pool.query(`SELECT *, 'reservation' AS _trash_type FROM reservations WHERE trashed_at IS NOT NULL${scope} ORDER BY trashed_at DESC`, params),
+      pool.query(`SELECT *, 'cancellation' AS _trash_type FROM cancellations WHERE trashed_at IS NOT NULL${scope} ORDER BY trashed_at DESC`, params),
     ]);
     const items = [
       ...res1.rows.map(r => ({ ...dbToRes(r), _trashType: 'reservation', _trashedAt: r.trashed_at })),
@@ -282,13 +307,15 @@ app.get('/api/trash', requireAuth, requireMaster, async (req, res) => {
 });
 
 // POST /api/trash/:id/restore
-app.post('/api/trash/:id/restore', requireAuth, requireMaster, async (req, res) => {
+app.post('/api/trash/:id/restore', requireAuth, async (req, res) => {
   try {
     const { type } = req.body; // 'reservation' | 'cancellation'
     const table = type === 'cancellation' ? 'cancellations' : 'reservations';
+    const params = [req.params.id];
+    const scope = hotelScope(req, params);
     const { rows } = await pool.query(
-      `UPDATE ${table} SET trashed_at = NULL WHERE id = $1 RETURNING *`,
-      [req.params.id]
+      `UPDATE ${table} SET trashed_at = NULL WHERE id = $1${scope} RETURNING *`,
+      params
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     res.json({ ok: true });
@@ -296,21 +323,25 @@ app.post('/api/trash/:id/restore', requireAuth, requireMaster, async (req, res) 
 });
 
 // DELETE /api/trash/:id  → permanent delete
-app.delete('/api/trash/:id', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/trash/:id', requireAuth, async (req, res) => {
   try {
     const { type } = req.body;
     const table = type === 'cancellation' ? 'cancellations' : 'reservations';
-    await pool.query(`DELETE FROM ${table} WHERE id = $1 AND trashed_at IS NOT NULL`, [req.params.id]);
+    const params = [req.params.id];
+    const scope = hotelScope(req, params);
+    await pool.query(`DELETE FROM ${table} WHERE id = $1${scope} AND trashed_at IS NOT NULL`, params);
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
 
 // DELETE /api/trash  → empty trash
-app.delete('/api/trash', requireAuth, requireMaster, async (req, res) => {
+app.delete('/api/trash', requireAuth, async (req, res) => {
   try {
+    const params = [];
+    const scope = hotelScope(req, params);
     await Promise.all([
-      pool.query(`DELETE FROM reservations WHERE trashed_at IS NOT NULL`),
-      pool.query(`DELETE FROM cancellations WHERE trashed_at IS NOT NULL`),
+      pool.query(`DELETE FROM reservations WHERE trashed_at IS NOT NULL${scope}`, params),
+      pool.query(`DELETE FROM cancellations WHERE trashed_at IS NOT NULL${scope}`, params),
     ]);
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
@@ -354,7 +385,7 @@ app.post('/api/track', async (req, res) => {
 });
 
 // GET /api/analytics?days=30  (master only)
-app.get('/api/analytics', requireAuth, requireMaster, async (req, res) => {
+app.get('/api/analytics', requireAuth, requireSuperadmin, async (req, res) => {
   try {
     const days  = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
     const jst   = new Date(Date.now() + 9 * 3600 * 1000);
