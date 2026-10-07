@@ -1,0 +1,2922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Niseko Village Bus — Summer 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10180f;
+  --ink-soft:#2a3528;
+  --paper:#f3ecdf;
+  --paper-2:#ebe2d0;
+  --cream:#e3d7bd;
+  --moss:#1f3a26;
+  --moss-2:#2d5236;
+  --sage:#6b8a6e;
+  --sage-soft:#a5b8a3;
+  --mist:#cfd9c9;
+  --gold:#a6802a;
+  --gold-soft:#c9a44a;
+  --white:#fbf7ee;
+  --red:#8c2a20;
+  --shadow:rgba(15,28,18,.14);
+  --shadow-lg:rgba(15,28,18,.22);
+  --hairline:rgba(31,58,38,.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(circle at 12% 0%,rgba(31,58,38,.05),transparent 40%),
+    radial-gradient(circle at 95% 30%,rgba(166,128,42,.05),transparent 35%);
+}
+
+::selection{background:var(--moss);color:var(--white)}
+
+/* refined utility */
+.kicker{font-family:'DM Sans',sans-serif;font-size:11.5px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.kicker::before{content:"";display:inline-block;width:24px;height:1px;background:var(--gold);vertical-align:middle;margin-right:12px;transform:translateY(-2px)}
+.serif{font-family:'Cormorant Garamond',serif}
+
+/* storage warning */
+.storage-warn{display:none;background:var(--red);color:#fff;padding:10px 48px;font-size:11.5px;letter-spacing:.15em;text-transform:uppercase}
+.storage-warn.show{display:block}
+
+/* ════ HERO ════ */
+.hero{
+  position:relative;
+  min-height:clamp(560px,82vh,780px);
+  display:flex;align-items:flex-end;
+  overflow:hidden;
+  isolation:isolate;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background-image:url('niseko-hero.jpg');
+  /* cover + no-repeat: con background-size en % la imagen no cubría
+     el alto del hero en móvil/tablet y se repetía en vertical */
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-position:center 30%;
+  /* el zoom lento se hace con transform, no con background-size */
+  transform:scale(1.02);
+  transform-origin:center 30%;
+  transition:transform 14s ease;
+  filter:saturate(1.05) contrast(1.02);
+  will-change:transform;
+}
+@media (hover:hover){
+  .hero:hover .hero-bg{transform:scale(1.09)}
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(10,18,12,.15) 0%,rgba(10,18,12,.10) 35%,rgba(10,18,12,.70) 80%,rgba(10,18,12,.92) 100%),
+    linear-gradient(90deg,rgba(10,18,12,.55) 0%,transparent 55%);
+}
+.hero::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 50% 110%,rgba(31,58,38,.55),transparent 60%);
+  pointer-events:none;
+}
+.hero-frame{
+  position:absolute;inset:24px;border:1px solid rgba(243,236,223,.18);
+  pointer-events:none;z-index:2;
+}
+.hero-top{
+  position:absolute;top:0;left:0;right:0;z-index:3;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:28px 56px;
+  color:rgba(243,236,223,.78);
+  font-size:12.5px;letter-spacing:.25em;text-transform:uppercase;
+}
+.hero-top .h-mark{font-family:'Shippori Mincho',serif;font-size:14.5px;letter-spacing:.18em;color:#fff;font-weight:500}
+.hero-top .h-mark span{color:var(--gold-soft);margin-right:10px;letter-spacing:.4em}
+.hero-top .h-loc{display:flex;gap:18px;align-items:center}
+.hero-top .h-loc::before{content:"";width:32px;height:1px;background:rgba(243,236,223,.4)}
+
+.hero-content{position:relative;z-index:3;padding:0 56px 72px;width:100%;max-width:1280px;margin:0 auto}
+.hero-eyebrow{
+  font-family:'Shippori Mincho',serif;
+  font-size:12px;letter-spacing:.55em;
+  color:#d4aa48;
+  text-transform:none;margin-bottom:22px;
+  opacity:0;animation:heroIn .9s ease .15s forwards;
+  display:inline-flex;align-items:center;gap:14px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{content:"";width:36px;height:1px;background:#d4aa48;opacity:.65}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(46px,7vw,96px);
+  font-weight:400;
+  color:#fff;letter-spacing:-.005em;line-height:.98;
+  margin-bottom:18px;
+  opacity:0;animation:heroIn .9s ease .3s forwards;
+  max-width:14ch;
+}
+.hero-title em{font-style:italic;color:var(--gold-soft);font-weight:300}
+.hero-sub{
+  font-size:14px;color:rgba(207,217,201,.85);
+  letter-spacing:.22em;font-weight:300;
+  margin-bottom:36px;text-transform:uppercase;
+  opacity:0;animation:heroIn .9s ease .45s forwards;
+  max-width:48ch;line-height:1.7;
+}
+.hero-sub span.dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--gold-soft);margin:0 14px 3px;vertical-align:middle}
+.hero-badges{display:flex;flex-wrap:wrap;gap:12px;align-items:center;opacity:0;animation:heroIn .9s ease .6s forwards}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(166,128,42,.15);
+  border:1px solid var(--gold-soft);
+  color:var(--gold-soft);
+  font-size:10.5px;letter-spacing:.28em;
+  padding:9px 18px;font-weight:500;text-transform:uppercase;
+  backdrop-filter:blur(6px);
+}
+.hero-badge.solid{background:var(--gold);border-color:var(--gold);color:#fff}
+.hero-badge-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(243,236,223,.35);
+  color:rgba(243,236,223,.85);
+  font-size:10.5px;letter-spacing:.22em;
+  padding:8px 16px;font-weight:300;text-transform:uppercase;
+  backdrop-filter:blur(6px);
+}
+
+.hero-jp{
+  position:absolute;right:56px;bottom:72px;z-index:3;
+  writing-mode:vertical-rl;
+  font-family:'Shippori Mincho',serif;
+  font-size:13px;letter-spacing:.35em;
+  color:rgba(243,236,223,.5);
+  line-height:2;
+  opacity:0;animation:heroIn 1.2s ease .8s forwards;
+}
+.hero-scroll{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:3;
+  font-size:11.5px;letter-spacing:.4em;color:rgba(243,236,223,.5);text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.hero-scroll::after{content:"";width:1px;height:36px;background:linear-gradient(to bottom,var(--gold-soft),transparent);animation:scrollPulse 2.2s ease-in-out infinite}
+@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(.7)}50%{opacity:1;transform:scaleY(1)}}
+
+@keyframes heroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════ NOTICE ════ */
+.notice{
+  background:linear-gradient(90deg,var(--cream),var(--paper-2));
+  padding:18px 56px;font-size:14.5px;letter-spacing:.05em;line-height:1.7;color:#4a3e28;
+  display:flex;align-items:center;gap:18px;
+  border-bottom:1px solid var(--hairline);
+}
+.notice::before{
+  content:"";flex-shrink:0;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--moss);
+  box-shadow:0 0 0 4px rgba(42, 166, 100, 0.18);
+}
+.notice strong{font-weight:500;color:var(--moss)}
+
+/* ════ NAV TABS ════ */
+.nav-tabs{
+  background:rgba(251,247,238,.92);
+  backdrop-filter:blur(14px) saturate(1.2) brightness(1.08);
+  border-bottom:1px solid var(--hairline);
+  display:flex;justify-content:center;
+  padding:0 48px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 8px 24px -16px var(--shadow);
+  overflow-x:hidden;scrollbar-width:none;
+}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{
+  padding:20px 26px;cursor:pointer;
+  font-size:13px;letter-spacing:.22em;text-transform:uppercase;
+  font-weight:400;color:var(--sage);
+  border:none;background:none;
+  position:relative;white-space:nowrap;
+  transition:color .25s ease;
+}
+.nav-tab::after{
+  content:"";position:absolute;left:50%;bottom:0;
+  width:0;height:1.5px;background:var(--moss);
+  transform:translateX(-50%);
+  transition:width .3s ease;
+}
+.nav-tab:hover{color:var(--moss)}
+.nav-tab:hover::after{width:30px}
+.nav-tab.active{color:var(--moss);font-weight:500}
+.nav-tab.active::after{width:48px;background:var(--gold)}
+
+/* ════ MAIN ════ */
+main{max-width:1100px;margin:0 auto;padding:80px 32px 120px}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* section header for each panel */
+.panel-head{margin-bottom:48px;text-align:center;position:relative}
+.panel-head .kicker{display:block;margin-bottom:18px}
+.panel-head h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,4.6vw,54px);
+  font-weight:400;color:var(--moss);
+  letter-spacing:-.01em;line-height:1.05;
+  margin-bottom:14px;
+}
+.panel-head h2 em{font-style:italic;color:var(--gold)}
+.panel-head p{font-size:16px;color:var(--sage);line-height:1.75;max-width:54ch;margin:0 auto;letter-spacing:.02em}
+.panel-head::after{content:"";display:block;width:1px;height:36px;background:linear-gradient(to bottom,var(--gold),transparent);margin:28px auto 0}
+
+/* ════ SCHEDULE ════ */
+.dir-tabs{
+  display:flex;justify-content:center;
+  margin-bottom:40px;
+  border-bottom:1px solid var(--hairline);
+  gap:8px;
+}
+.dir-tab{
+  padding:16px 32px;cursor:pointer;
+  font-size:13.5px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:400;color:var(--sage);
+  background:none;border:none;
+  border-bottom:1.5px solid transparent;margin-bottom:-1px;
+  transition:all .25s ease;
+  white-space:nowrap;
+}
+.dir-tab:hover{color:var(--moss)}
+.dir-tab.active{color:var(--moss);border-bottom-color:var(--gold);font-weight:500}
+
+.period-selector{margin-bottom:48px;text-align:center}
+.period-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:500}
+.period-pills{display:inline-flex;flex-wrap:wrap;gap:0;justify-content:center;border:1px solid var(--hairline);background:var(--white)}
+.period-pill{
+  padding:11px 24px;border:none;
+  font-size:13.5px;cursor:pointer;
+  letter-spacing:.08em;font-family:inherit;
+  background:none;color:var(--ink-soft);
+  border-right:1px solid var(--hairline);
+  transition:all .2s ease;
+}
+.period-pill:last-child{border-right:none}
+.period-pill:hover{background:var(--paper);color:var(--moss)}
+.period-pill.active{background:var(--moss);color:var(--white);font-weight:500}
+
+/* ════ BUS CARDS ════ */
+.buses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px}
+.bus-card{
+  background:var(--white);
+  border:1px solid var(--hairline);
+  overflow:hidden;
+  transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s ease;
+  animation:fadeUp .55s ease both;
+  position:relative;
+}
+.bus-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity .35s ease;z-index:2;
+}
+.bus-card:hover{transform:translateY(-6px);box-shadow:0 22px 60px -20px var(--shadow-lg)}
+.bus-card:hover::before{opacity:1}
+.bus-card:nth-child(2){animation-delay:.08s}
+.bus-card:nth-child(3){animation-delay:.16s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.bus-card-img{position:relative;height:160px;overflow:hidden;background:linear-gradient(135deg,#1f3a26 0%,#2d5235 100%)}
+.bus-card-img img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;transition:transform .9s ease;padding:8px 0;filter:none}
+.bus-card:hover .bus-card-img img{transform:scale(1.08)}
+.bus-card-img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(10,18,12,.55) 0%,rgba(10,18,12,.15) 70%);
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:18px 22px;
+}
+.bus-card-img-overlay .bus-top-row{display:flex;justify-content:space-between;align-items:flex-start}
+.bus-tag{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#fff;letter-spacing:.01em;line-height:1;font-style:italic}
+.bus-tag-period{display:block;font-size:11.5px;letter-spacing:.28em;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:8px;font-family:'DM Sans',sans-serif;font-weight:400;font-style:normal}
+.bus-card-img .corner{
+  font-family:'Shippori Mincho',serif;
+  font-size:10px;letter-spacing:.3em;
+  color:var(--gold-soft);text-transform:uppercase;
+  border:1px solid var(--gold-soft);
+  padding:4px 10px;
+  background:rgba(10,18,12,.4);backdrop-filter:blur(4px);
+}
+
+.bus-card-body{padding:22px 26px 24px}
+.route{display:flex;flex-direction:column}
+.stop{display:flex;align-items:flex-start;gap:16px}
+.stop-dot-col{display:flex;flex-direction:column;align-items:center;width:12px;flex-shrink:0;padding-top:5px}
+.stop-dot{width:9px;height:9px;border-radius:50%;background:var(--mist);flex-shrink:0;border:2px solid var(--white);box-shadow:0 0 0 1px var(--mist)}
+.stop:first-child .stop-dot,.stop:last-child .stop-dot{background:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.stop-line{width:1px;flex:1;background:linear-gradient(to bottom,var(--mist),var(--mist) 50%,transparent 50%);background-size:1px 6px;min-height:20px;margin:3px 0}
+.stop-info{padding-bottom:16px;flex:1}
+.stop:last-child .stop-info{padding-bottom:0}
+.stop-time{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;letter-spacing:0;color:var(--ink);line-height:1;margin-bottom:4px}
+.stop-name{font-size:14px;color:var(--ink-soft);letter-spacing:.04em;line-height:1.4;font-weight:400}
+.stop-name-jp{font-family:'Shippori Mincho',serif;font-size:13px;color:var(--sage);margin-top:2px;letter-spacing:.05em}
+
+.travel-time{margin-top:20px;padding-top:16px;border-top:1px solid var(--hairline);display:flex;align-items:center;gap:8px;padding-left:28px}
+.travel-time svg{opacity:.5;flex-shrink:0;color:var(--gold)}
+.travel-time span{font-size:13px;color:var(--sage);letter-spacing:.08em;text-transform:uppercase;font-weight:400}
+
+.book-btn{
+  display:block;margin-top:18px;text-align:center;
+  background:var(--moss);color:var(--white);
+  font-size:12.5px;letter-spacing:.28em;text-transform:uppercase;
+  padding:14px;border:none;cursor:pointer;
+  transition:background .25s ease,letter-spacing .25s ease;
+  width:100%;font-family:'DM Sans',sans-serif;font-weight:500;
+  position:relative;overflow:hidden;
+}
+.book-btn:hover{background:var(--ink);letter-spacing:.32em}
+
+/* ════ RESERVATION FORM ════ */
+.form-wrap{
+  background:var(--white);
+  border:1px solid var(--hairline);
+  padding:80px 56px 48px;
+  max-width:760px;margin:0 auto;
+  position:relative;overflow:hidden;
+  box-shadow:0 30px 80px -40px var(--shadow);
+}
+.form-wrap::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--moss),var(--gold) 50%,var(--moss));
+}
+.form-wrap::after{
+  content:"";position:absolute;top:-40px;right:-40px;width:240px;height:240px;
+  background-image:url('niseko-hero.jpg');
+  background-size:cover;background-position:center;
+  opacity:.22;pointer-events:none;border-radius:50%;
+  filter:blur(2px);
+}
+.form-eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:14px;position:relative}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:400;color:var(--moss);margin-bottom:8px;position:relative;letter-spacing:-.005em;line-height:1.05}
+.form-title em{font-style:italic;color:var(--gold)}
+.form-subtitle{font-size:15px;color:var(--sage);letter-spacing:.04em;margin-bottom:44px;position:relative;line-height:1.7;max-width:48ch}
+.reserve-notice{background:var(--paper);border:1px solid var(--hairline);border-left:3px solid var(--gold);padding:22px 24px 20px;margin-bottom:36px;position:relative}
+.reserve-notice-head{font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.reserve-notice p{font-size:15px;color:var(--ink-soft);line-height:1.75;letter-spacing:.02em}
+.reserve-notice p strong{color:var(--moss);font-weight:500}
+.reserve-notice-sub{font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin:20px 0 10px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 28px;position:relative}
+.form-full{grid-column:1/-1}
+.form-section-label{
+  font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);
+  margin:30px 0 18px;padding-bottom:12px;
+  border-bottom:1px solid var(--hairline);
+  grid-column:1/-1;font-weight:500;
+  display:flex;align-items:center;gap:14px;
+}
+.form-section-label::before{content:"";display:inline-block;width:24px;height:1px;background:var(--gold)}
+.form-section-label:first-of-type{margin-top:0}
+.field label{display:block;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;font-weight:500}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--paper);
+  border:none;border-bottom:1.5px solid var(--cream);
+  padding:12px 4px;
+  font-family:'DM Sans',sans-serif;font-size:16px;
+  color:var(--ink);outline:none;
+  transition:border-color .25s ease,background .25s ease;
+  appearance:none;border-radius:0;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--sage-soft);font-weight:300}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a6802a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;padding-right:32px;cursor:pointer;background-color:var(--paper);
+}
+.field select option{background:var(--white);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;padding:10px}
+.field select option:first-child{color:var(--sage-soft)}
+.field select:invalid,.field select option[value=""]{color:var(--sage-soft)}
+.field input:focus,.field select:focus,.field textarea:focus{border-bottom-color:var(--gold);background:var(--white)}
+.field textarea{resize:vertical;min-height:90px;padding:12px}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-bottom-color:var(--red);background:#faf0ee}
+.field-error{display:none;font-size:13px;color:var(--red);margin-top:6px;letter-spacing:.04em;font-weight:400}
+.field.invalid .field-error{display:block;animation:shakeIn .3s ease}
+@keyframes shakeIn{0%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
+.field-hint{font-size:13px;color:var(--sage);margin-top:6px;letter-spacing:.05em;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:15px}
+
+/* bus summary banner */
+.bus-summary-bar{
+  display:none;
+  border-left:3px solid var(--moss);
+  background:var(--paper-2);
+  padding:18px 22px;
+  gap:0;
+  flex-wrap:wrap;
+  margin-top:32px;
+  margin-bottom:36px;
+  position:relative;
+}
+.bus-summary-bar.visible{display:flex}
+.bus-summary-item{
+  display:flex;flex-direction:column;gap:5px;
+  padding:0 28px 0 0;
+  border-right:1px solid var(--hairline);
+  margin-right:28px;
+}
+.bus-summary-item:last-child{border-right:none;margin-right:0;padding-right:0}
+.bus-summary-lbl{
+  font-size:9px;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--sage);font-weight:500;
+}
+.bus-summary-val{
+  font-family:'Cormorant Garamond',serif;font-size:18px;
+  color:var(--moss);font-weight:500;letter-spacing:.01em;line-height:1.1;
+}
+
+.submit-btn{
+  width:100%;background:var(--moss);color:var(--white);
+  border:none;padding:18px;
+  font-family:'DM Sans',sans-serif;font-size:13.5px;
+  letter-spacing:.32em;text-transform:uppercase;cursor:pointer;
+  transition:background .25s ease,letter-spacing .25s ease;
+  margin-top:36px;font-weight:500;position:relative;
+}
+.submit-btn:hover{background:var(--ink);letter-spacing:.38em}
+.submit-btn:disabled{opacity:.55;cursor:not-allowed}
+
+/* ════ SUCCESS SCREEN ════ */
+.success-screen{
+  max-width:560px;margin:0 auto;text-align:center;
+  background:var(--white);
+  border:1px solid var(--hairline);
+  padding:60px 48px 52px;
+  animation:fadeUp .55s ease;
+  box-shadow:0 30px 80px -40px var(--shadow);position:relative;
+}
+.success-screen::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--moss),var(--gold) 50%,var(--moss))}
+.success-check{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--moss);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 28px;animation:pop .5s cubic-bezier(.2,1.4,.4,1) .1s both;
+  box-shadow:0 0 0 8px rgba(31,58,38,.08);
+}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.success-check svg{stroke:#fff}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:400;color:var(--moss);margin-bottom:10px;letter-spacing:-.005em}
+.success-title em{font-style:italic;color:var(--gold)}
+.success-sub{font-size:15.5px;color:var(--sage);line-height:1.75;margin-bottom:32px;max-width:42ch;margin-left:auto;margin-right:auto}
+.success-ref{background:var(--paper);border:1px solid var(--hairline);padding:24px 28px;margin-bottom:32px;text-align:left}
+.success-ref-row{display:flex;justify-content:space-between;padding:9px 0;font-size:15px;border-bottom:1px dashed var(--cream)}
+.success-ref-row:last-child{border-bottom:none}
+.success-ref-row .k{color:var(--sage);letter-spacing:.12em;text-transform:uppercase;font-size:10.5px;font-weight:500}
+.success-ref-row .v{font-weight:500;color:var(--ink)}
+.success-ref-row .v.code{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);letter-spacing:.05em;font-size:16px;font-weight:500}
+.success-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.success-btn{background:var(--moss);color:#fff;border:none;padding:14px 28px;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:background .25s ease;font-weight:500}
+.success-btn:hover{background:var(--ink)}
+.success-btn.ghost{background:none;border:1.5px solid var(--cream);color:var(--sage)}
+.success-btn.ghost:hover{border-color:var(--moss);color:var(--moss);background:none}
+
+/* ════ EXPLORE ════ */
+.explore-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.explore-card{position:relative;display:block;overflow:hidden;text-decoration:none;background:var(--moss)}
+.explore-card img{width:100%;height:auto;display:block;transition:transform .7s ease,filter .7s ease;filter:brightness(1.0) saturate(1.08)}
+.explore-card:hover img{transform:scale(1.08);filter:brightness(.6) saturate(1.15)}
+.explore-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(8,18,10,.82) 0%,rgba(8,18,10,.05) 60%,transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:24px 26px;transition:background .35s ease;
+}
+.explore-card:hover .explore-card-overlay,.footer-img-strip a:hover .explore-card-overlay{background:linear-gradient(to top,rgba(8,18,10,.92) 0%,rgba(8,18,10,.3) 80%,rgba(8,18,10,.1) 100%)}
+.footer-img-strip a .explore-card-overlay{justify-content:flex-start;padding:14px 16px}
+.explore-cat{font-size:9.5px;letter-spacing:.38em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:8px;font-weight:500}
+.explore-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#fff;line-height:1.15;margin-bottom:10px;letter-spacing:-.005em}
+.explore-card:first-child .explore-name{font-size:24px;font-style:italic}
+.explore-arrow{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#fff;font-weight:400;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+.explore-arrow::after{content:"→";font-size:14px;transition:transform .3s}
+.explore-card:hover .explore-arrow,.footer-img-strip a:hover .explore-arrow{opacity:1;transform:translateY(0)}
+.explore-card:hover .explore-arrow::after,.footer-img-strip a:hover .explore-arrow::after{transform:translateX(4px)}
+
+/* ════ FAQ ════ */
+.section-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;color:var(--moss);margin:0 0 36px;padding-bottom:18px;border-bottom:1px solid var(--hairline);letter-spacing:-.005em;display:flex;align-items:baseline;gap:14px}
+.section-title em{font-style:italic;color:var(--gold);font-size:24px}
+.faq-with-img{display:grid;grid-template-columns:1fr 340px;gap:56px;align-items:start}
+.faq-img-aside{position:sticky;top:96px;overflow:hidden;border:1px solid var(--hairline)}
+.faq-img-aside img{width:100%;height:240px;object-fit:contain;object-position:center;display:block;filter:saturate(1.05);background:var(--moss)}
+.faq-img-aside .faq-img-caption{padding:8px 20px 18px;background:var(--moss);font-size:14px;color:rgba(207,217,201,.85);letter-spacing:.06em;line-height:1.6}
+.faq-img-aside .faq-img-caption strong{display:block;color:#fff;font-size:20px;margin-bottom:5px;font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:0}
+.faq-item{border-bottom:1px solid var(--hairline)}
+.faq-q{width:100%;text-align:left;padding:20px 0;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:400;color:var(--ink);letter-spacing:.02em;transition:color .2s ease}
+.faq-q:hover{color:var(--moss)}
+.faq-arrow{flex-shrink:0;width:18px;height:18px;transition:transform .3s ease;color:var(--gold)}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;font-size:15.5px;line-height:1.85;color:var(--ink-soft)}
+.faq-a-inner{padding-bottom:22px;padding-right:32px}
+
+.conn-table{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px;border:1px solid var(--hairline)}
+.conn-table th{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--moss);font-weight:500;padding:12px 16px;text-align:left;background:var(--paper);border-bottom:1px solid var(--hairline)}
+.conn-table td{padding:12px 16px;border-bottom:1px solid var(--hairline);color:var(--ink)}
+.conn-table tr:last-child td{border-bottom:none}
+.conn-table td strong{color:var(--gold);font-weight:500}
+.airport-card{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--hairline);overflow:hidden;margin-top:24px;background:var(--white)}
+.airport-card img{width:100%;height:100%;object-fit:cover;display:block;min-height:240px;filter:saturate(1.05)}
+.airport-card-body{padding:32px;display:flex;flex-direction:column;justify-content:center}
+.airport-card-label{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:500}
+.airport-card-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:var(--moss);margin-bottom:14px;letter-spacing:-.005em}
+.airport-card-text{font-size:15px;color:var(--ink-soft);line-height:1.8}
+.stop-number{display:inline-block;background:var(--moss);color:var(--white);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:5px 14px;margin-top:16px;border:1px solid var(--moss)}
+
+/* ════ TERMS BLOCK ════ */
+.terms-block{
+  margin-top:64px;
+  padding:40px 48px;
+  background:var(--white);
+  border:1px solid var(--hairline);
+  position:relative;
+}
+.terms-block::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.terms-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:400;
+  color:var(--moss);
+  margin-bottom:28px;
+  letter-spacing:-.005em;
+}
+.terms-title em{font-style:italic;color:var(--gold)}
+.terms-list{list-style:none;display:flex;flex-direction:column;gap:16px}
+.terms-list li{display:flex;align-items:baseline;gap:14px;font-size:15.5px;line-height:1.75;color:var(--ink-soft)}
+.terms-dot{flex-shrink:0;width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block;margin-top:8px}
+.terms-list li strong{color:var(--ink);font-weight:500}
+
+/* ════ PDF LINK ════ */
+.pdf-link{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:20px;
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;text-decoration:none;
+  border-bottom:1px solid rgba(166,128,42,.3);
+  padding-bottom:2px;
+  transition:color .2s ease,border-color .2s ease;
+}
+.pdf-link:hover{color:var(--moss);border-color:var(--moss)}
+
+/* ════ CANCEL PANEL ════ */
+.cancel-form-wrap::before{background:linear-gradient(90deg,var(--red),var(--moss) 50%,var(--red))}
+.cancel-submit{background:var(--red) !important}
+.cancel-submit:hover{background:#6b1e16 !important}
+.cancel-check{background:var(--red) !important}
+.checkbox-label{display:flex;align-items:center;gap:.85rem;cursor:pointer;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);line-height:1.5;user-select:none}
+.checkbox-label input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.checkbox-custom{flex-shrink:0;width:1.25rem;height:1.25rem;border:1.5px solid var(--stone);border-radius:3px;background:var(--paper);display:inline-flex;align-items:center;justify-content:center;line-height:0;transition:background .18s,border-color .18s,box-shadow .18s}
+.checkbox-custom:hover{border-color:var(--red);box-shadow:0 0 0 3px color-mix(in srgb,var(--red) 12%,transparent)}
+.checkbox-label input[type=checkbox]:checked + .checkbox-custom{background:var(--red);border-color:var(--red)}
+.checkbox-label input[type=checkbox]:checked + .checkbox-custom svg{opacity:1;transform:scale(1)}
+.checkbox-custom svg{display:block;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.checkbox-custom{cursor:pointer}
+.field.invalid .checkbox-custom{border-color:var(--red);box-shadow:0 0 0 3px color-mix(in srgb,var(--red) 15%,transparent)}
+.cancel-title em{color:var(--red) !important}
+
+/* ════ TOAST ════ */
+.toast{position:fixed;bottom:32px;right:32px;z-index:9999;background:var(--ink);color:var(--white);padding:15px 26px;font-size:15px;letter-spacing:.05em;opacity:0;pointer-events:none;transform:translateY(8px);transition:all .3s ease;max-width:340px;line-height:1.5;box-shadow:0 20px 40px -10px var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-left:3px solid var(--gold)}
+.toast.error{border-left:3px solid var(--red)}
+
+/* ════ MODAL ════ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(8,18,10,.65);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+.modal{background:var(--white);max-width:540px;width:100%;animation:fadeUp .35s ease;overflow:hidden;border:1px solid var(--hairline);box-shadow:0 40px 100px -20px rgba(0,0,0,.5)}
+.modal-img{width:100%;height:180px;object-fit:cover;display:block;filter:brightness(.9) saturate(1.05)}
+.modal-body{padding:32px 36px 36px;position:relative}
+.modal-close{position:absolute;top:18px;right:20px;background:none;border:none;cursor:pointer;color:var(--sage);font-size:22px;line-height:1;transition:color .2s ease}
+.modal-close:hover{color:var(--red)}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--moss);margin-bottom:6px;letter-spacing:-.005em}
+.modal-sub{font-size:15px;color:var(--sage);margin-bottom:26px;letter-spacing:.04em;line-height:1.6}
+.modal-go-btn{display:block;width:100%;background:var(--moss);color:var(--white);border:none;padding:15px;font-family:'DM Sans',sans-serif;font-size:13.5px;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:background .25s ease,letter-spacing .25s ease;font-weight:500}
+.modal-go-btn:hover{background:var(--ink);letter-spacing:.34em}
+
+/* ════ EMPTY STATE ════ */
+.empty-state{text-align:center;padding:80px 20px;color:var(--sage);font-size:13px;letter-spacing:.08em;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:18px}
+.empty-state svg{opacity:.3;margin:0 auto 18px;display:block;color:var(--gold)}
+
+/* ════ REVEAL ════ */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ════ FOOTER ════ */
+
+.footer-hero{position:relative;height:clamp(280px,38vw,440px);overflow:hidden;background:#1f3a26}
+.footer-hero img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95) contrast(1.02)}
+.footer-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(243,236,223,.15) 0%,transparent 30%,transparent 60%,rgba(243,236,223,.40) 100%);pointer-events:none;z-index:1}
+.footer-hero.dark-overlay::before{background:linear-gradient(180deg,rgba(10,18,12,.15) 0%,transparent 35%,transparent 50%,rgba(10,18,12,.75) 100%)}
+.footer-hero-caption{position:absolute;left:0;right:0;bottom:8%;text-align:center;z-index:2;color:#fbf7ee;text-shadow:0 2px 20px rgba(10,18,12,.9),0 0 60px rgba(10,18,12,.6)}
+.footer-hero-caption .jp{font-family:'Shippori Mincho',serif;font-size:14.5px;letter-spacing:.45em;color:#c9a44a;display:block;margin-bottom:14px}
+.footer-hero-caption h3{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:clamp(28px,4vw,46px);line-height:1.1;letter-spacing:.005em}
+.footer-hero-caption h3 em{color:#c9a44a;font-style:italic}
+.footer-hero.reserve-caption .footer-hero-caption{color:#fff;text-shadow:0 2px 12px rgba(10,18,12,1),0 0 40px rgba(10,18,12,.95),0 0 80px rgba(10,18,12,.7)}
+.footer-hero.reserve-caption .footer-hero-caption .jp{color:#f0c84a;text-shadow:0 2px 10px rgba(10,18,12,1),0 0 30px rgba(10,18,12,.9)}
+.footer-hero.reserve-caption .footer-hero-caption h3 em{color:#f0c84a}
+@media (max-width:720px){.footer-hero{height:240px}}
+
+/* ════ FOOTER — elegant ivory ════ */
+footer{background:linear-gradient(180deg,var(--paper) 0%,var(--paper-2) 100%);padding:0;overflow:hidden;position:relative;color:var(--ink)}
+footer::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.footer-img-strip{display:grid;grid-template-columns:repeat(4,1fr);height:160px;gap:1px;background:var(--hairline);border-bottom:1px solid var(--hairline)}
+.footer-img-strip div,.footer-img-strip a{overflow:hidden;position:relative;background:var(--paper-2);display:block}
+.footer-img-strip div img,.footer-img-strip a img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.25) contrast(1.12) brightness(1.05);transition:filter .6s ease,transform 1s ease}
+.footer-img-strip div:hover img,.footer-img-strip a:hover img{filter:saturate(1.4) contrast(1.15) brightness(1.08);transform:scale(1.05)}
+.footer-img-strip div::after,.footer-img-strip a::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(10,18,12,.25) 65%,rgba(243,236,223,.55) 100%);pointer-events:none}
+.strip-label{position:absolute;top:28px;right:14px;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:#fff;font-weight:400;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;text-shadow:0 1px 6px rgba(0,0,0,.7);pointer-events:none;z-index:2}
+.footer-img-strip a:hover .strip-label{opacity:1;transform:translateY(0)}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap;align-items:center}
+.footer-back-top{color:inherit;text-decoration:none;transition:color .25s ease;white-space:nowrap}
+.footer-back-top:hover{color:var(--moss)}
+.footer-links a{font-size:12.5px;letter-spacing:.24em;color:var(--ink-soft);text-decoration:none;transition:color .25s ease;text-transform:uppercase;position:relative;font-weight:400}
+.footer-links a:hover{color:var(--moss)}
+.footer-links a:hover::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:var(--gold)}
+.footer-meta{width:100%;padding:22px 48px 24px;border-top:1px solid var(--hairline);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);opacity:.7}
+.footer-meta span:first-child{justify-self:start;align-self:center;line-height:1}
+.footer-season{justify-self:center;align-self:center;text-align:center;line-height:1;color:var(--gold);font-weight:500;white-space:nowrap}
+.footer-season::before,.footer-season::after{content:"";display:inline-block;width:18px;height:1px;background:var(--gold);vertical-align:middle;transform:translateY(-1px)}
+.footer-season::before{margin-right:14px}
+.footer-season::after{margin-left:14px}
+.footer-meta > :last-child{justify-self:end;align-self:center;line-height:1}
+
+
+
+/* ════ RESPONSIVE ════ */
+
+/* ── Tablet (≤960px) ── */
+@media(max-width:960px){
+  .hero-top{padding:22px 32px}
+  .hero-content{padding:0 32px 60px}
+  .hero-jp{right:32px;bottom:60px;font-size:11px}
+  .explore-grid{grid-template-columns:1fr 1fr}
+  .explore-card:first-child .explore-name{font-size:22px}
+  .faq-with-img{grid-template-columns:1fr;gap:36px}
+  .faq-img-aside{position:static}
+  .airport-card{grid-template-columns:1fr}
+  .airport-card img{min-height:200px;max-height:240px}
+  .footer-img-strip{grid-template-columns:repeat(2,1fr)}
+  .form-wrap{padding:44px 32px 36px}
+  .bus-summary-bar{flex-wrap:wrap;gap:16px 0;margin-right:0}
+}
+
+/* ── Mobile (≤640px) ── */
+@media(max-width:640px){
+  .hero{min-height:480px}
+  .hero-top{padding:16px 18px;font-size:9.5px}
+  .hero-top .h-loc::before{width:14px}
+  .hero-top .h-mark{font-size:11px}
+  .hero-content{padding:0 20px 48px}
+  .hero-eyebrow{font-size:9px;letter-spacing:.3em}
+  .hero-title{font-size:clamp(36px,10vw,56px)}
+  .hero-sub{font-size:12px;letter-spacing:.06em}
+  .hero-jp{display:none}
+  .hero-scroll{display:none}
+  .hero-badges{gap:8px}
+  .hero-badge,.hero-badge-outline{font-size:9px;padding:7px 14px}
+  .notice,.storage-warn{padding:12px 18px;font-size:11px}
+  .nav-tabs{padding:0 4px;justify-content:flex-start}
+  .nav-tab{padding:14px 12px;font-size:10px;letter-spacing:.18em}
+  main{padding:36px 16px 60px}
+  .panel-head h2{font-size:28px}
+  .panel-head p{font-size:13px}
+  .dir-tabs{flex-direction:column;gap:0}
+  .dir-tab{padding:13px 16px;font-size:10.5px;border-right:none;border-bottom:1px solid var(--hairline)}
+  .period-pills{flex-direction:column;width:100%}
+  .period-pill{border-right:none;border-bottom:1px solid var(--hairline)}
+  .period-pill:last-child{border-bottom:none}
+  .buses-grid{grid-template-columns:1fr;gap:16px}
+  .form-wrap,.success-screen{padding:32px 18px 28px}
+  .form-grid{grid-template-columns:1fr}
+  .form-title{font-size:28px}
+  .bus-summary-bar{flex-direction:column;gap:14px;padding:16px 18px;margin-top:20px;margin-bottom:24px}
+  .bus-summary-item{border-right:none;margin-right:0;padding-right:0;border-bottom:1px solid var(--hairline);padding-bottom:12px}
+  .bus-summary-item:last-child{border-bottom:none;padding-bottom:0}
+  .explore-grid{grid-template-columns:1fr;gap:4px}
+  .footer-img-strip{grid-template-columns:repeat(2,1fr)}
+  .footer-hero-caption h3{font-size:clamp(22px,6vw,32px)}
+  .footer-meta{padding:12px 18px 18px;grid-template-columns:1fr;gap:6px;text-align:center}
+  .footer-meta > :first-child,.footer-meta > :last-child{justify-self:center}
+}
+
+/* ── Small phones (≤400px) ── */
+@media(max-width:400px){
+  .nav-tab{padding:12px 8px;font-size:9.5px;letter-spacing:.12em}
+  .hero-title{font-size:32px}
+  .form-wrap,.success-screen{padding:24px 14px}
+}
+/* ════ LIGHTBOX ════ */
+.lightbox-trigger{cursor:zoom-in;transition:opacity .2s ease}
+.lightbox-trigger:hover{opacity:.88}
+.lightbox-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(8,14,10,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px}
+.lightbox-overlay.open{display:flex;animation:fadeIn .25s ease}
+.lightbox-inner{position:relative;max-width:min(1100px,95vw);max-height:90vh;display:flex;flex-direction:column;align-items:center;gap:14px}
+.lightbox-inner img{max-width:100%;max-height:80vh;object-fit:contain;border:1px solid rgba(243,236,223,.15);box-shadow:0 40px 100px -20px rgba(0,0,0,.6)}
+.lightbox-close{position:absolute;top:-14px;right:-14px;width:36px;height:36px;border-radius:50%;background:var(--paper);border:1px solid var(--hairline);color:var(--ink);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s ease}
+.lightbox-close:hover{background:var(--cream)}
+.lightbox-hint{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:rgba(243,236,223,.45)}
+/* ════ LANG SWITCHER ════ */
+.lang-switcher{display:flex;align-items:center;gap:3px;position:fixed;bottom:24px;left:24px;z-index:9998;background:rgba(251,247,238,.97);border:1px solid var(--hairline);box-shadow:0 8px 28px -8px var(--shadow-lg);padding:5px 7px;backdrop-filter:blur(12px)}
+.lang-btn{background:none;border:none;cursor:pointer;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);padding:5px 9px;font-family:'DM Sans',sans-serif;font-weight:400;transition:color .2s ease,background .2s ease;white-space:nowrap;line-height:1}
+.lang-btn:hover{color:var(--moss)}
+.lang-btn.active{color:var(--white);background:var(--moss);font-weight:500}
+.lang-divider{width:1px;height:12px;background:var(--hairline);flex-shrink:0}
+@media(max-width:640px){.lang-switcher{bottom:14px;left:14px;padding:4px 5px}.lang-btn{font-size:10px;padding:4px 6px;letter-spacing:.08em}}
+/* CJK hero title overrides */
+:lang(ja) .hero-title,:lang(zh-Hans) .hero-title{max-width:none;white-space:normal}
+:lang(ja) .hero-title{font-size:clamp(34px,5vw,72px)}
+:lang(zh-Hans) .hero-title{font-size:clamp(40px,6vw,84px)}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE & TABLET LAYER
+   (bloque final: sobrescribe reglas anteriores)
+   ════════════════════════════════════════════════════ */
+
+/* ── Base táctil: evita hovers "pegados" y zoom de iOS ── */
+@media (hover:none){
+  .bus-card:hover{transform:none;box-shadow:0 10px 30px -18px var(--shadow)}
+  .explore-card:hover img,.bus-card:hover .bus-card-img img{transform:none}
+  .lightbox-trigger:hover{opacity:1}
+}
+/* 16px mínimo en campos de texto: evita el auto-zoom de Safari iOS */
+@media(max-width:900px){
+  input[type=text],input[type=email],input[type=tel],input[type=number],
+  input[type=date],input[type=search],input[type=password],select,textarea{font-size:16px}
+}
+input,select,textarea{max-width:100%}
+img,svg,video{max-width:100%}
+
+/* ── Tabs de navegación desplazables en pantallas estrechas ── */
+@media(max-width:900px){
+  .nav-tabs{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    justify-content:flex-start;
+    padding:0 8px;
+    scroll-snap-type:x proximity;
+  }
+  .nav-tab{scroll-snap-align:center;flex:0 0 auto}
+}
+
+/* ── Tablet (≤1024px) ── */
+@media(max-width:1024px){
+  /* Hero más bajo: el contenido va alineado abajo, así que reducir la
+     altura elimina el hueco entre la barra superior y ニセコの夏 */
+  .hero{min-height:clamp(340px,38svh,440px);padding-top:75px}
+  .hero-frame{inset:18px}
+  /* la barra superior debe quedar DENTRO del marco */
+  .hero-top{padding:30px 34px}
+  .hero-content{padding:0 34px 36px}
+  .hero-eyebrow{margin-bottom:14px}
+  .hero-title{font-size:clamp(40px,6vw,62px)}
+  .hero-sub{max-width:58ch;letter-spacing:.14em;margin-bottom:20px}
+  .hero-badges{gap:8px}
+  .hero-jp{display:none}
+  /* el indicador "Scroll" se solapaba con los badges del hero */
+  .hero-scroll{display:none}
+  main{padding:44px 24px 70px}
+  .buses-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+  .form-grid{gap:18px 20px}
+  .faq-with-img{grid-template-columns:1fr}
+  .faq-img-aside{position:static}
+}
+
+/* ── Móvil (≤640px) ── */
+@media(max-width:640px){
+  .hero{min-height:clamp(300px,40svh,400px);padding-top:64px}
+  .hero-frame{inset:12px}
+  /* NISEKO VILLAGE / HOKKAIDO 北海道 dentro del marco */
+  .hero-top{padding:22px 22px}
+  .hero-content{padding:0 22px 28px}
+  .hero-eyebrow{margin-bottom:12px}
+  .hero-sub{margin-bottom:18px}
+  .nav-tab{padding:15px 14px;min-height:48px}
+  main{padding:32px 14px 56px}
+
+  /* Tablas de conexión: ajustan al ancho en vez de desbordar */
+  .conn-table{table-layout:fixed;width:100%;font-size:12.5px}
+  .conn-table th,.conn-table td{padding:9px 8px;white-space:normal;overflow-wrap:anywhere;letter-spacing:.02em}
+  .conn-table th{font-size:9.5px;letter-spacing:.12em}
+
+  /* FAQ */
+  .faq-a-inner{padding-right:0}
+
+  /* Formularios */
+  .form-grid{grid-template-columns:1fr;gap:16px}
+  .field textarea{min-height:110px}
+  .submit-btn,.cancel-submit{width:100%;min-height:52px}
+
+  /* Pantalla de éxito / resumen */
+  .success-ref-row{flex-direction:column;align-items:flex-start;gap:2px}
+  .success-ref-row .k{font-size:10px}
+  .success-ref-row .v{font-size:14px;word-break:break-word}
+
+  /* Lightbox */
+  .lightbox-overlay{padding:14px}
+  .lightbox-close{top:6px;right:6px}
+  .lightbox-inner img{max-height:72vh}
+
+  /* Selector de idioma: esquina, sin tapar contenido */
+  .lang-switcher{bottom:10px;left:10px}
+}
+
+/* ── Teléfonos pequeños (≤400px) ── */
+@media(max-width:400px){
+  .hero{min-height:clamp(280px,36svh,350px);padding-top:56px}
+  .hero-frame{inset:10px}
+  .hero-top{padding:18px 18px}
+  .hero-content{padding:0 18px 24px}
+  .hero-sub{margin-bottom:14px}
+  main{padding:26px 12px 48px}
+  .nav-tab{padding:13px 10px;font-size:9.5px;letter-spacing:.1em}
+  .form-wrap,.success-screen{padding:22px 14px}
+  .panel-head h2{font-size:24px}
+  .lang-btn{padding:5px 7px}
+}
+
+/* ── Landscape bajo (móvil girado) ── */
+@media (max-height:520px) and (orientation:landscape){
+  .hero{min-height:100svh}
+  .lang-switcher{bottom:8px}
+}
+
+/* ════ VISUAL REFINEMENT ════ */
+:root{--ink:#122038;--ink-soft:#35455c;--paper:#f4f7fb;--paper-2:#e9f0f7;--cream:#dbe6f0;--moss:#173f7a;--moss-2:#0e2d5c;--sage:#71839b;--sage-soft:#aab9ca;--mist:#d4e0eb;--gold:#d7993e;--gold-soft:#f0bd69;--white:#fff;--shadow:rgba(20,55,100,.13);--shadow-lg:rgba(11,37,76,.25);--hairline:rgba(23,63,122,.14)}
+body{background-color:var(--paper);background-image:radial-gradient(circle at 10% 0%,rgba(57,123,198,.13),transparent 34%),radial-gradient(circle at 100% 28%,rgba(215,153,62,.10),transparent 29%),linear-gradient(135deg,rgba(255,255,255,.52),transparent 50%)}
+.hero{min-height:clamp(580px,84vh,820px)}.hero-bg{filter:saturate(1.08) contrast(1.05)}.hero-overlay{background:linear-gradient(180deg,rgba(7,20,42,.14) 0%,rgba(7,20,42,.12) 34%,rgba(7,20,42,.75) 80%,rgba(7,20,42,.94) 100%),linear-gradient(90deg,rgba(7,20,42,.6) 0%,transparent 62%)}.hero-frame{border-radius:18px;border-color:rgba(255,255,255,.28)}
+.hero-badge,.hero-badge-outline{border-radius:99px}.hero-badge{box-shadow:0 8px 20px rgba(6,24,52,.18)}
+.notice{background:linear-gradient(90deg,#e4edf7,#f7f9fc);color:var(--ink-soft);padding:19px max(32px,calc((100% - 1100px)/2));box-shadow:inset 0 1px rgba(255,255,255,.75)}.notice::before{background:var(--gold);box-shadow:0 0 0 5px rgba(215,153,62,.16)}
+.nav-tabs{background:rgba(255,255,255,.84);border-color:rgba(23,63,122,.1);box-shadow:0 10px 28px -20px rgba(14,45,92,.35)}.nav-tab{letter-spacing:.18em}.nav-tab.active::after{height:3px;border-radius:3px 3px 0 0}
+main{max-width:1160px}.panel-head h2{font-size:clamp(40px,4.8vw,58px)}
+.period-pills{border-radius:12px;overflow:hidden;box-shadow:0 8px 22px rgba(20,55,100,.07)}.period-pill{padding:12px 25px}.period-pill.active{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.bus-card{border-radius:16px;border-color:rgba(23,63,122,.12);box-shadow:0 8px 24px rgba(20,55,100,.05)}.bus-card:hover{transform:translateY(-7px);box-shadow:0 24px 54px -20px var(--shadow-lg)}.bus-card::before{height:4px;background:linear-gradient(90deg,var(--moss),#397bc6 58%,var(--gold))}.bus-card-img{background:linear-gradient(135deg,#102c58,#235b9b)}.bus-card-img-overlay{background:linear-gradient(135deg,rgba(7,26,55,.62),rgba(7,26,55,.12) 72%)}.bus-card-img .corner{border-radius:99px}.book-btn,.submit-btn,.success-btn,.modal-go-btn{border-radius:9px;box-shadow:0 8px 18px rgba(23,63,122,.16)}.book-btn:hover,.submit-btn:hover,.success-btn:hover,.modal-go-btn:hover{background:var(--moss-2)}
+.form-wrap,.success-screen{border-radius:18px;border-color:rgba(23,63,122,.12);box-shadow:0 28px 72px -40px var(--shadow-lg)}.form-wrap::before,.success-screen::before{height:4px;background:linear-gradient(90deg,var(--moss),#397bc6 56%,var(--gold))}.reserve-notice{border-radius:10px;background:#f4f8fc}.field input,.field select,.field textarea{background:#f5f8fc;border:1px solid transparent;border-bottom-color:#ccd9e7;border-radius:8px;padding:12px 13px}.field input:focus,.field select:focus,.field textarea:focus{border-color:#397bc6;background:#fff;box-shadow:0 0 0 4px rgba(57,123,198,.11)}
+.bus-summary-bar,.success-ref,.terms-block,.airport-card,.conn-table{border-radius:12px;overflow:hidden}.bus-summary-bar{background:#edf3f9}.success-check{box-shadow:0 0 0 9px rgba(23,63,122,.09)}
+.explore-card{border-radius:14px;box-shadow:0 10px 26px rgba(20,55,100,.1)}.faq-img-aside{border-radius:14px;box-shadow:0 12px 32px rgba(20,55,100,.09)}.airport-card{box-shadow:0 10px 28px rgba(20,55,100,.06)}.terms-block{box-shadow:0 10px 28px rgba(20,55,100,.05)}
+.modal{border-radius:16px;box-shadow:0 34px 90px -20px rgba(6,27,60,.5)}.modal-overlay{background:rgba(5,22,48,.65)}.modal-go-btn{margin-top:3px}.toast{border-radius:11px;box-shadow:0 18px 38px rgba(6,27,60,.28)}
+.footer-hero{background:#102c58}
+@media(max-width:1024px){.hero{min-height:clamp(340px,42svh,470px)}.content{padding-left:26px;padding-right:26px}}
+@media(max-width:640px){.hero{min-height:clamp(310px,43svh,410px)}.hero-frame{border-radius:13px}.notice{padding:16px 22px}.bus-card,.form-wrap,.success-screen{border-radius:13px}.form-wrap,.success-screen{box-shadow:0 18px 42px -28px var(--shadow-lg)}}
+
+/* clear pre-filled bus selection (icono en esquina superior derecha) */
+.bus-summary-bar .bus-summary-item:nth-last-child(2){border-right:none;margin-right:0;padding-right:0}
+.bus-summary-clear{
+  position:absolute;top:6px;right:6px;
+  width:26px;height:26px;padding:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;cursor:pointer;
+  font:inherit;font-size:13px;line-height:1;color:var(--sage);
+  transition:color .2s,border-color .2s,background .2s
+}
+.bus-summary-clear:hover,.bus-summary-clear:focus-visible{color:var(--moss);border-color:var(--gold);background:var(--white);outline:none}
+@media(max-width:640px){
+  .bus-summary-bar{padding-right:44px}
+  .bus-summary-bar .bus-summary-item:nth-last-child(2){border-bottom:none;padding-bottom:0}
+}
+/* footer meta en móvil/tablet: solo Back to top, centrado */
+@media(max-width:1024px){
+  .footer-meta{display:flex;justify-content:center;padding:16px 18px}
+  .footer-meta > span{display:none}
+}
+/* en móvil el selector de idioma ocupa el centro: Back to top a la derecha, a su lado */
+@media(max-width:640px){
+  .footer-meta{justify-content:flex-end;padding:18px 18px 22px}
+}
+/* TEST MODE banner */
+.test-mode-banner{position:fixed;right:0;bottom:0;z-index:99999;background:#b3261e;color:#fff;font:600 11px/1 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;pointer-events:none;opacity:.92}
+</style>
+</head>
+<body>
+
+<div class="storage-warn" id="storageWarn">
+  ⚠ Your browser is blocking local storage (private mode?). Reservations cannot be saved on this device.
+</div>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-frame"></div>
+  <div class="hero-top">
+    <div class="h-mark"><span>○</span>Niseko Village</div>
+    <div class="h-loc">Hokkaido · 北海道</div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">ニセコの夏 — Summer in Niseko</div>
+    <h1 class="hero-title">Niseko Village <em>Bus</em><br>Summer 2027</h1>
+    <div class="hero-sub">New Chitose Airport<span class="dot"></span>Hilton Niseko Village<span class="dot"></span>A scenic crossing through Hokkaido's verdant heart</div>
+    <div class="hero-badges">
+      <span class="hero-badge solid">Summer 2027</span>
+      <span class="hero-badge-outline">May 15 — Sep 30</span>
+      <span class="hero-badge-outline">Reservation Required</span>
+    </div>
+  </div>
+  <div class="hero-jp">羊蹄山　森林　温泉　夏</div>
+  <div class="hero-scroll">Scroll</div>
+</header>
+
+<div class="notice">
+  <div><strong>Reservation required.</strong> Bookings open one month before your visit and close 4 days prior to travel. The bus will not run without reservations. Exclusively for guests staying at hotels within Niseko Village.</div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" data-panel="schedule">Schedule</button>
+  <button class="nav-tab" data-panel="reserve">Book a Seat</button>
+  <button class="nav-tab" data-panel="explore">Explore Niseko</button>
+  <button class="nav-tab" data-panel="cancel">Cancel a Reservation</button>
+  <button class="nav-tab" data-panel="faq">FAQ</button>
+</div>
+
+<main>
+
+  <!-- SCHEDULE -->
+  <div class="panel active" id="panel-schedule">
+    <div class="panel-head">
+      <span class="kicker">Timetable · 時刻表</span>
+      <h2>A journey through <em>Hokkaido's</em> summer</h2>
+      <p>Direct coach service between New Chitose Airport and the foothills of Mt. Yotei. Choose your direction and travel window to view the season's schedule.</p>
+      <a href="https://nisekovillagebus.com/wp-content/uploads/sites/92/2026/04/AIRPORT-SHUTTLE-BUS-2026.pdf" target="_blank" class="pdf-link">↓ Download PDF Schedule</a>
+    </div>
+    <div class="dir-tabs">
+      <button class="dir-tab active" data-dir="arrival">✈ New Chitose Airport → Niseko Village</button>
+      <button class="dir-tab" data-dir="departure">🏔 Niseko Village → New Chitose Airport</button>
+    </div>
+    <div class="period-selector">
+      <div class="period-label">Travel Period</div>
+      <div class="period-pills" id="periodPills"></div>
+    </div>
+    <div class="buses-grid" id="busCards"></div>
+  </div>
+
+  <!-- RESERVE -->
+  <div class="panel" id="panel-reserve">
+    <div class="form-wrap" id="reserveFormWrap">
+      <div class="form-eyebrow">Reservation · 予約</div>
+      <div class="form-title">Request a <em>seat</em></div>
+      <div class="form-subtitle" id="formBusLabel">Share a few details and we'll register your place on board. Our team will confirm by email within 24 hours.</div>
+
+      <div class="bus-summary-bar" id="busSummaryBar">
+        <div class="bus-summary-item">
+          <span class="bus-summary-lbl">Bus</span>
+          <span class="bus-summary-val" id="busSummary_name">—</span>
+        </div>
+        <div class="bus-summary-item">
+          <span class="bus-summary-lbl">Direction</span>
+          <span class="bus-summary-val" id="busSummary_dir">—</span>
+        </div>
+        <div class="bus-summary-item">
+          <span class="bus-summary-lbl">Departs</span>
+          <span class="bus-summary-val" id="busSummary_time">—</span>
+        </div>
+        <div class="bus-summary-item">
+          <span class="bus-summary-lbl">Period</span>
+          <span class="bus-summary-val" id="busSummary_period">—</span>
+        </div>
+        <button type="button" class="bus-summary-clear" id="busSummaryClear" aria-label="Clear selection" title="Clear selection"><span aria-hidden="true">✕</span></button>
+      </div>
+
+      <div class="reserve-notice">
+        <div class="reserve-notice-head">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+          Important Notice
+        </div>
+        <p>Passengers arriving on <strong>international flights</strong> must ensure they gather in front of the Arrivals Hall on the second floor at least 15 minutes before the bus departs. Passengers arriving on <strong>domestic flights</strong> should proceed directly to bus stop 98.</p>
+        <div class="reserve-notice-sub">Connecting Time</div>
+        <table class="conn-table">
+          <thead>
+            <tr>
+              <th>Flight Type</th>
+              <th>From Airplane to Bus</th>
+              <th>From Bus to Airplane</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Domestic Flight</td>
+              <td><strong>60 min</strong></td>
+              <td><strong>60 min</strong></td>
+            </tr>
+            <tr>
+              <td>International Flight</td>
+              <td><strong>90 min</strong></td>
+              <td><strong>120 min</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-section-label">Guest Information</div>
+
+        <div class="field form-full" data-field="f_reservationId">
+          <label>Reservation ID</label>
+          <input type="text" id="f_reservationId" placeholder="e.g. NV-123456">
+        </div>
+
+        <div class="field" data-field="f_first">
+          <label>First Name (on Reservation) *</label>
+          <input type="text" id="f_first" placeholder="Yuki" autocomplete="given-name">
+          <div class="field-error">First name is required.</div>
+        </div>
+        <div class="field" data-field="f_last">
+          <label>Last Name (on Reservation) *</label>
+          <input type="text" id="f_last" placeholder="Tanaka" autocomplete="family-name">
+          <div class="field-error">Last name is required.</div>
+        </div>
+        <div class="field" data-field="f_email">
+          <label>Email *</label>
+          <input type="email" id="f_email" placeholder="you@example.com" autocomplete="email">
+          <div class="field-error">Enter a valid email address.</div>
+        </div>
+        <div class="field" data-field="f_phone">
+          <label>Phone</label>
+          <input type="tel" id="f_phone" placeholder="+81 90-0000-0000" autocomplete="tel">
+          <div class="field-error">Enter a valid phone number.</div>
+        </div>
+        <div class="field" data-field="f_guests">
+          <label>Number of Guests *</label>
+          <input type="number" id="f_guests" placeholder="Less than or equal to 35" min="1" max="35">
+          <div class="field-error">Enter the number of guests.</div>
+        </div>
+        <div class="field" data-field="f_golfBags">
+          <label>Number of Golf Bags</label>
+          <input type="number" id="f_golfBags" placeholder="0" min="0">
+        </div>
+        <div class="field" data-field="f_luggage">
+          <label>Luggage Pieces</label>
+          <input type="number" id="f_luggage" placeholder="0" min="0">
+        </div>
+
+        <div class="form-section-label">Journey Details</div>
+
+        <div class="field" data-field="f_dir">
+          <label>Direction *</label>
+          <select id="f_dir">
+            <option value="">Select…</option>
+            <option value="arrival">CTS Airport → Niseko Village</option>
+            <option value="departure">Niseko Village → CTS Airport</option>
+          </select>
+          <div class="field-error">Select a direction.</div>
+        </div>
+        <div class="field" data-field="f_bus">
+          <label>Bus *</label>
+          <select id="f_bus"><option value="">Select direction first…</option></select>
+          <div class="field-error">Select a bus.</div>
+        </div>
+        <div class="field" data-field="f_date">
+          <label>Travel Date *</label>
+          <input type="date" id="f_date">
+          <div class="field-error">Choose a valid date.</div>
+          <div class="field-hint" id="dateHint"></div>
+        </div>
+        <div class="field" data-field="f_hotel">
+          <label>Hotel *</label>
+          <select id="f_hotel">
+            <option value="">Select…</option>
+            <option>Hilton Niseko Village</option>
+            <option>Hinode Hills</option>
+            <option>Ritz-Carlton Reserve</option>
+            <option>Moxy</option>
+          </select>
+          <div class="field-error">Select your hotel.</div>
+        </div>
+        <div class="field" data-field="f_flight">
+          <label>Flight Number</label>
+          <input type="text" id="f_flight" placeholder="NH 1234">
+        </div>
+        <div class="field" data-field="f_flighttype" id="f_flighttype_wrap" style="display:none">
+          <label>Flight Type</label>
+          <select id="f_flighttype">
+            <option value="">Select…</option>
+            <option value="domestic">Domestic</option>
+            <option value="international">International</option>
+          </select>
+        </div>
+        <div class="field form-full" data-field="f_notes">
+          <label>Special Requests / Notes</label>
+          <textarea id="f_notes" placeholder="Wheelchair assistance, dietary needs, infant seats…"></textarea>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn">Confirm Reservation →</button>
+    </div>
+
+    <!-- success screen -->
+    <div class="success-screen" id="successScreen" style="display:none;">
+      <div class="success-check">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">Reservation <em>received</em></div>
+      <div class="success-sub">Your seat request has been registered. Our team will confirm your booking by email shortly. Please keep your reference number safe.</div>
+      <div class="success-ref" id="successRef"></div>
+      <div class="success-actions">
+        <button class="success-btn" id="newBookingBtn">Make Another Booking</button>
+        <button class="success-btn ghost" id="backToScheduleBtn">Back to Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORE -->
+  <div class="panel" id="panel-explore">
+    <div class="panel-head">
+      <span class="kicker">Discover · 探索</span>
+      <h2>Summer in <em>Niseko</em></h2>
+      <p>Beyond the mountain — world-class dining, onsen, golf and quiet wilderness await between May and September.</p>
+    </div>
+    <div class="explore-grid" id="exploreGrid"></div>
+  </div>
+
+  <!-- CANCEL -->
+  <div class="panel" id="panel-cancel">
+    <div class="panel-head">
+      <span class="kicker">Cancellation · キャンセル</span>
+      <h2>Cancel a <em>Reservation</em></h2>
+      <p>Need to adjust your plans? Submit your request below and our team will confirm the cancellation by email within 24 hours.</p>
+    </div>
+
+    <div class="form-wrap cancel-form-wrap" id="cancelFormWrap">
+      <div class="form-eyebrow">Cancellation Request · キャンセル申請</div>
+      <div class="form-title">Your <em>request</em></div>
+      <div class="form-subtitle">Please provide your booking details and we'll take care of the rest.</div>
+
+      <div class="form-grid">
+        <div class="form-section-label">Booking Details</div>
+
+        <div class="field form-full" data-field="cf_ref">
+          <label>Reservation Reference *</label>
+          <input type="text" id="cf_ref" placeholder="e.g. ABC123" autocomplete="off">
+          <div class="field-error">Reservation reference is required.</div>
+        </div>
+        <div class="field" data-field="cf_first">
+          <label>First Name *</label>
+          <input type="text" id="cf_first" placeholder="Yuki" autocomplete="given-name">
+          <div class="field-error">First name is required.</div>
+        </div>
+        <div class="field" data-field="cf_last">
+          <label>Last Name *</label>
+          <input type="text" id="cf_last" placeholder="Tanaka" autocomplete="family-name">
+          <div class="field-error">Last name is required.</div>
+        </div>
+        <div class="field" data-field="cf_email">
+          <label>Email *</label>
+          <input type="email" id="cf_email" placeholder="you@example.com" autocomplete="email">
+          <div class="field-error">Enter a valid email address.</div>
+        </div>
+        <div class="field" data-field="cf_date">
+          <label>Travel Date *</label>
+          <input type="date" id="cf_date" min="2026-05-15" max="2026-09-30">
+          <div class="field-error">Travel date is required.</div>
+        </div>
+        <div class="field" data-field="cf_hotel">
+          <label>Hotel</label>
+          <select id="cf_hotel">
+            <option value="">Select…</option>
+            <option>Hilton Niseko Village</option>
+            <option>Hinode Hills</option>
+            <option>Ritz-Carlton Reserve</option>
+            <option>Moxy</option>
+          </select>
+        </div>
+
+        <div class="field form-full" data-field="cf_reason">
+          <label>Reason for Cancellation *</label>
+          <textarea id="cf_reason" placeholder="Please briefly explain why you are cancelling your reservation." rows="3"></textarea>
+          <div class="field-error">Please provide a reason for cancellation.</div>
+        </div>
+
+        <div class="field form-full" data-field="cf_confirm">
+          <div class="checkbox-label">
+            <input type="checkbox" id="cf_confirm">
+            <label for="cf_confirm" class="checkbox-custom">
+              <svg width="13" height="13" viewBox="0 0 10 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin:auto">
+                <polyline points="1 12 3.5 15 9 8"/>
+              </svg>
+            </label>
+            <span>I want to cancel my bus reservation *</span>
+          </div>
+          <div class="field-error">Please confirm you want to cancel your reservation.</div>
+        </div>
+      </div>
+
+      <button class="submit-btn cancel-submit" id="cancelSubmitBtn">Submit Cancellation Request →</button>
+    </div>
+
+    <div class="success-screen" id="cancelSuccessScreen" style="display:none;">
+      <div class="success-check cancel-check">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title cancel-title">Request <em>submitted</em></div>
+      <div class="success-sub">Your cancellation request has been received. Our team will confirm via email within 24 hours.</div>
+      <div class="success-ref" id="cancelSuccessRef"></div>
+      <div class="success-actions">
+        <button class="success-btn ghost" id="cancelBackBtn">Back to Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="panel" id="panel-faq">
+    <div class="section-title">FAQ &amp; Service Terms <em>よくある質問</em></div>
+    <div class="faq-with-img">
+      <div id="faqList"></div>
+      <div>
+        <div class="faq-img-aside">
+          <img src="bus.jpg" alt="Niseko Village Bus" onerror="this.style.display='none'">
+          <div class="faq-img-caption">
+            <strong>Niseko Village Limousine Bus</strong>
+            <span class="faq-cap-body">Comfortable direct service between New Chitose Airport and hotels within Niseko Village.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="terms-block reveal">
+      <div class="terms-title">Bus Service <em>Terms &amp; Conditions</em></div>
+      <ul class="terms-list">
+        <li><span class="terms-dot"></span><span><strong>Operation Period</strong> May 15th – September 30th.</span></li>
+        <li><span class="terms-dot"></span><span>Bookings can be made from one month before your visit.</span></li>
+        <li><span class="terms-dot"></span><span>This service is available exclusively to guests staying at hotels within Niseko Village.</span></li>
+        <li><span class="terms-dot"></span><span>Bookings can be made via our website up to four days in advance.</span></li>
+        <li><span class="terms-dot"></span><span>Please note that you will not be able to board the bus without a reservation.</span></li>
+        <li><span class="terms-dot"></span><span>Furthermore, the bus will not run if there are no reservations.</span></li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-img-strip">
+    <a href="https://travel.gaijinpot.com/special/niseko/dining/" target="_blank" rel="noopener"><img src="dining.jpg" alt="Dining" onerror="this.parentElement.style.display='none'"><span class="strip-label">Explore →</span></a>
+    <a href="https://travel.gaijinpot.com/special/niseko/relaxation/" target="_blank" rel="noopener"><img src="onsen.jpg" alt="Onsen" onerror="this.parentElement.style.display='none'"><span class="strip-label">Explore →</span></a>
+    <a href="https://travel.gaijinpot.com/special/niseko/golf/" target="_blank" rel="noopener"><img src="golf.jpg" alt="Golf" onerror="this.parentElement.style.display='none'"><span class="strip-label">Explore →</span></a>
+    <a href="https://travel.gaijinpot.com/special/niseko/outdoors/" target="_blank" rel="noopener"><img src="outdoor-adventures.jpg" alt="Outdoors" onerror="this.parentElement.style.display='none'"><span class="strip-label">Explore →</span></a>
+  </div>
+
+  <div class="footer-hero">
+    <img id="footerHeroImg" src="niseko-footer.jpg" alt="Mt. Yotei and Niseko Village in summer" onerror="this.style.display='none'">
+    <div class="footer-hero-caption">
+      <span class="jp" id="footerHeroJp">羊蹄山 · 夏</span>
+      <h3 id="footerHeroTitle">Where Hokkaido <em>Breathes</em></h3>
+    </div>
+  </div>
+  <div class="footer-meta">
+    <span>© 2027 Niseko Village</span>
+    <span class="footer-season">Summer 2027</span>
+    <a href="#" class="footer-back-top" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'})">Back to top ↑</a>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <img class="modal-img" src="bus.jpg" alt="" onerror="this.style.display='none'">
+    <div class="modal-body">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-title" id="modalTitle">Book a Seat</div>
+      <div class="modal-sub" id="modalSub">We'll pre-fill the form for you.</div>
+      <button class="modal-go-btn" id="modalGo">Go to Reservation Form →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   API CONFIG
+   ════════════════════════════════════════════════════════════ */
+const API_BASE = '';  /* empty = same origin; set to full URL if needed */
+/* ── TEST MODE ───────────────────────────────────────────────────
+   true  = todos los buses y fechas abiertos para pruebas
+   false = reglas de producción (periodos + ventana 1 mes / 4 días)
+   ────────────────────────────────────────────────────────────── */
+const TEST_MODE = true;
+if (TEST_MODE) {
+  (function(){
+    const b = document.createElement('div');
+    b.className = 'test-mode-banner';
+    b.textContent = 'TEST MODE';
+    document.body.appendChild(b);
+    const cf = document.getElementById('cf_date');
+    if (cf) { cf.removeAttribute('min'); cf.removeAttribute('max'); }
+  })();
+}
+const _originalFooterSrc = document.getElementById('footerHeroImg')?.src || '';
+
+const PERIODS = [
+  { id:'p1', label:'May 15 – Jun 15' },
+  { id:'p2', label:'Jun 16 – Aug 31' },
+  { id:'p3', label:'Sep 1 – Sep 30'  },
+];
+
+const STOPS_ARRIVAL = [
+  { en:'New Chitose Airport',          jp:'新千歳空港（国際線）', ko:'신치토세 공항（국제선）', zh:'新千岁机场（国际线）' },
+  { en:'Hinode Hills',                 jp:'ヒノデヒルズ',         ko:'히노데 힐스',            zh:'日出山庄' },
+  { en:'Ritz-Carlton Reserve',         jp:'リッツ・カールトン',   ko:'리츠칼튼 리저브',         zh:'丽思卡尔顿精选' },
+  { en:'Hilton Niseko Village & Moxy', jp:'ヒルトンニセコビレッジ & モキシ', ko:'힐튼 니세코 빌리지 & 목시', zh:'希尔顿倶知安村 & 莫克西' },
+];
+const STOPS_DEPARTURE = [
+  { en:'Hilton Niseko Village & Moxy', jp:'ヒルトンニセコビレッジ & モキシ', ko:'힐튼 니세코 빌리지 & 목시', zh:'希尔顿倶知安村 & 莫克西' },
+  { en:'Ritz-Carlton Reserve',         jp:'リッツ・カールトン',               ko:'리츠칼튼 리저브',           zh:'丽思卡尔顿精选' },
+  { en:'Hinode Hills',                 jp:'ヒノデヒルズ',                     ko:'히노데 힐스',               zh:'日出山庄' },
+  { en:'New Chitose (Domestic)',        jp:'新千歳空港（国内線）',             ko:'신치토세 공항（국내선）',    zh:'新千岁机场（国内线）' },
+  { en:"New Chitose (Int'l)",          jp:'新千歳空港（国際線）',             ko:'신치토세 공항（국제선）',    zh:'新千岁机场（国际线）' },
+];
+
+const BUS_IMG = 'bus.jpg';
+
+const BUSES_ARRIVAL = [
+  { id:'A1', label:'Bus A1', periods:['p1'],      times:['14:30','16:50','16:55','17:00'], duration:'~2h 30min', periodLabel:'May 15 – Jun 15', start:'2026-05-15', end:'2026-06-15' },
+  { id:'A2', label:'Bus A2', periods:['p2'], times:['13:15','15:35','15:40','15:45'], duration:'~2h 30min', periodLabel:'Jun 16 – Aug 31', start:'2026-06-16', end:'2026-08-31' },
+  { id:'A3', label:'Bus A3', periods:['p2'],      times:['15:00','17:20','17:25','17:30'], duration:'~2h 30min', periodLabel:'Jun 16 – Aug 31', start:'2026-06-16', end:'2026-08-31' },
+  { id:'A2b', label:'Bus A2', periods:['p3'], times:['13:15','15:35','15:40','15:45'], duration:'~2h 30min', periodLabel:'Sep 1 – Sep 30',  start:'2026-09-01', end:'2026-09-30' },
+];
+const BUSES_DEPARTURE = [
+  { id:'B1a', label:'Bus B1', periods:['p1'], times:['7:10','7:15','7:20','9:30','9:40'], duration:'~2h 30min', periodLabel:'May 15 – Jun 15', start:'2026-05-15', end:'2026-06-15' },
+  { id:'B1b', label:'Bus B1', periods:['p2'], times:['7:10','7:15','7:20','9:30','9:40'], duration:'~2h 30min', periodLabel:'Jun 16 – Aug 31', start:'2026-06-16', end:'2026-08-31' },
+  { id:'B2', label:'Bus B2', periods:['p2'], times:['9:30','9:35','9:40','11:50','12:00'], duration:'~2h 30min', periodLabel:'Jun 16 – Aug 31', start:'2026-06-16', end:'2026-08-31' },
+  { id:'B1c', label:'Bus B1', periods:['p3'], times:['7:10','7:15','7:20','9:30','9:40'], duration:'~2h 30min', periodLabel:'Sep 1 – Sep 30',  start:'2026-09-01', end:'2026-09-30' },
+];
+
+function busById(id) { return [...BUSES_ARRIVAL, ...BUSES_DEPARTURE].find(b => b.id === id); }
+
+const EXPLORE_LINKS = [
+  { img:'dining.jpg',           url:'https://travel.gaijinpot.com/special/niseko/dining/' },
+  { img:'onsen.jpg',            url:'https://travel.gaijinpot.com/special/niseko/relaxation/' },
+  { img:'golf.jpg',             url:'https://travel.gaijinpot.com/special/niseko/golf/' },
+  { img:'fun.jpg',              url:'https://travel.gaijinpot.com/special/niseko/family/' },
+  { img:'sightseeing.jpg',      url:'https://travel.gaijinpot.com/special/niseko/sightseeing/' },
+  { img:'outdoor-adventures.jpg', url:'https://travel.gaijinpot.com/special/niseko/outdoors/' },
+];
+
+const FAQS = [
+  { q:'Where is the meeting point at New Chitose Airport?', a:'Bus stop <strong>#98</strong> on the 1st floor of the International Terminal Building. From the Domestic Terminal, you must take the 2nd-floor connecting walkway (moving walkways available) to the International Terminal and then go down to the 1st floor. <br>For passengers arriving on international flights, the meeting point is in front of the 2F arrivals hall — once everyone is accounted for, the group moves to the bus stop together.<br><br><img src="Bus-stop.png" alt="New Chitose Airport Bus Stop No.98 map" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="Click to enlarge"><img src="Bus-stop-98.png" alt="Route from the Domestic Terminal to Bus Stop No.98" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="Click to enlarge">' },
+  { q:'My flight is delayed — will the bus wait?', a:'As a general rule, buses depart on time. If seats are available on the next bus, arrangements will be made; otherwise, guests will need to make their own way to Niseko (e.g. by JR train).' },
+  { q:'Are seats assigned?', a:'Seating is first-come, first-served. No advance seat reservations, but please let us know if you require special assistance (e.g. wheelchair users).' },
+  { q:'Is there a toilet on the bus?', a:'No onboard toilet. However, one toilet break stop is made during the journey.' },
+  { q:'Can I eat or drink on board?', a:'Water and tea are permitted. Please refrain from other food and drinks. Snacks for children are acceptable as long as seating stays clean. <strong>Soft-serve ice cream is not permitted.</strong>' },
+  { q:'Are pets allowed?', a:'No — pets are not permitted on the bus.' },
+  { q:'What connection times should I allow?', a:`<table class="conn-table"><thead><tr><th>Flight type</th><th>Plane → Bus</th><th>Bus → Plane</th></tr></thead><tbody><tr><td>Domestic</td><td><strong>60 min</strong></td><td><strong>60 min</strong></td></tr><tr><td>International</td><td><strong>90 min</strong></td><td><strong>120 min</strong></td></tr></tbody></table><br>Note: the operator is not liable for delays caused by circumstances beyond its control.` },
+];
+
+let schedState = { dir:'arrival', period:'p1' };
+let pendingBus = null;
+
+async function addReservation(r) {
+  try {
+    const resp = await fetch(`${API_BASE}/api/reservations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(r),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    return await resp.json();
+  } catch (e) {
+    showToast('Could not submit reservation. Please try again.', 'error');
+    return null;
+  }
+}
+
+let toastTimer;
+function showToast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
+}
+
+function renderPeriods() {
+  document.getElementById('periodPills').innerHTML =
+    PERIODS.map(p => `<button class="period-pill ${schedState.period===p.id?'active':''}" data-period="${p.id}">${p.label}</button>`).join('');
+}
+function renderBuses() {
+  const c = document.getElementById('busCards');
+  const buses = schedState.dir==='arrival' ? BUSES_ARRIVAL : BUSES_DEPARTURE;
+  const stops = schedState.dir==='arrival' ? STOPS_ARRIVAL  : STOPS_DEPARTURE;
+  const filtered = buses.filter(b => b.periods.includes(schedState.period));
+  if (!filtered.length) {
+    c.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>No buses scheduled for this period and direction.</p></div>`;
+    return;
+  }
+  c.innerHTML = filtered.map(bus => `
+    <div class="bus-card">
+      <div class="bus-card-img">
+        <img src="${BUS_IMG}" alt="Bus ${bus.id}" onerror="this.parentElement.style.background='var(--moss)';this.style.display='none'">
+
+      </div>
+      <div class="bus-card-body">
+        <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--cream)">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--ink);font-style:italic">${bus.label}</div>
+          <div style="font-size:13px;letter-spacing:.25em;color:var(--sage);text-transform:uppercase;margin-top:4px">${bus.periodLabel}</div>
+        </div>
+        <div class="route">
+          ${stops.map((stop,i) => `
+            <div class="stop">
+              <div class="stop-dot-col"><div class="stop-dot"></div>${i < stops.length-1 ? '<div class="stop-line"></div>' : ''}</div>
+              <div class="stop-info"><div class="stop-time">${bus.times[i]}</div><div class="stop-name">${stop.en}</div><div class="stop-name-jp">${stop.jp}</div></div>
+            </div>`).join('')}
+        </div>
+        <div class="travel-time"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Travel time ${bus.duration}</span></div>
+        ${(()=>{
+          const today=todayJST();
+          const start=new Date(bus.start+'T00:00:00Z');
+          const end=new Date(bus.end+'T00:00:00Z');
+          if(!TEST_MODE && today < start) return `<button class="book-btn" disabled style="opacity:.45;cursor:not-allowed;letter-spacing:.28em;" title="Reservations not yet open for this period">Coming soon</button>`;
+          if(!TEST_MODE && today > end)   return `<button class="book-btn" disabled style="opacity:.45;cursor:not-allowed;letter-spacing:.28em;" title="This service period has ended">Period ended</button>`;
+          return `<button class="book-btn" data-busid="${bus.id}" data-dir="${schedState.dir}">Book this bus →</button>`;
+        })()}
+      </div>
+    </div>
+  </div>`).join('');
+}
+function renderSchedule() { renderPeriods(); renderBuses(); }
+
+function renderExplore() {
+  document.getElementById('exploreGrid').innerHTML = EXPLORE_LINKS.map(e => `
+    <a class="explore-card" href="${e.url}" target="_blank" rel="noopener">
+      <img src="${e.img}" alt="${e.name}" loading="lazy" onerror="this.style.background='var(--moss)';this.style.minHeight='200px'">
+      <div class="explore-card-overlay"><span class="explore-arrow">Explore</span></div>
+    </a>`).join('');
+}
+
+function renderFaq() {
+  document.getElementById('faqList').innerHTML = FAQS.map(f => `
+    <div class="faq-item">
+      <button class="faq-q"><span>${f.q}</span><svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="faq-a"><div class="faq-a-inner">${f.a}</div></div>
+    </div>`).join('');
+  document.querySelectorAll('#faqList .lightbox-trigger').forEach(img => {
+    img.addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('lightboxImg').src = img.src;
+      document.getElementById('lightboxImg').alt = img.alt;
+      document.getElementById('lightboxOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+}
+
+function updateBusOptions() {
+  const dir = document.getElementById('f_dir').value;
+  const sel = document.getElementById('f_bus');
+  /* Always update flighttype visibility first */
+  document.getElementById('f_flighttype_wrap').style.display = (dir==='departure') ? '' : 'none';
+  if (dir !== 'departure') document.getElementById('f_flighttype').value = '';
+  if (!dir) { sel.innerHTML = '<option value="">Select direction first…</option>'; updateBusSummary(); return; }
+  const allBuses = dir==='arrival' ? BUSES_ARRIVAL : BUSES_DEPARTURE;
+  const todayStr = todayStrJST();
+  const buses = allBuses.filter(b => {
+    if (TEST_MODE) return true;
+    /* Period must not have ended */
+    if (b.end < todayStr) return false;
+    /* Booking window opens 1 month before the period start */
+    const start = new Date(b.start + 'T00:00:00Z');
+    const windowOpen = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - 1, start.getUTCDate()));
+    const windowOpenStr = windowOpen.toISOString().slice(0, 10);
+    return todayStr >= windowOpenStr;
+  });
+  if (!buses.length) {
+    sel.innerHTML = '<option value="">No buses available for this period</option>';
+    updateBusSummary(); return;
+  }
+  sel.innerHTML = '<option value="">Select bus…</option>' +
+    buses.map(b => `<option value="${b.id}">${b.label} — ${b.times[0]} dep. (${b.periodLabel})</option>`).join('');
+  updateDateHint();
+}
+/* ── Booking window helpers ──────────────────────────────────────
+   Reservations open  : 1 calendar month before the travel date
+   Reservations close : 4 days before the travel date
+   Example: travel on Jun 20 → window is May 20 – Jun 16
+   ────────────────────────────────────────────────────────────── */
+function bookingWindowOpen(travelDateStr) {
+  /* Returns true if TODAY falls within the booking window for travelDateStr */
+  if (TEST_MODE) return true;
+  const today = todayJST();
+  const travel = new Date(travelDateStr + 'T00:00:00Z');
+  // Open: 1 month before travel date (same day, 1 month earlier)
+  const opens = new Date(travel);
+  opens.setMonth(opens.getMonth() - 1);
+  // Close: 4 days before travel date
+  const closes = new Date(travel);
+  closes.setDate(closes.getDate() - 4);
+  return today >= opens && today <= closes;
+}
+function bookingWindowStatus(travelDateStr) {
+  /* Returns { open, opensOn, closesOn } */
+  const today = todayJST();
+  const travel = new Date(travelDateStr + 'T00:00:00Z');
+  const opens = new Date(travel);
+  opens.setMonth(opens.getMonth() - 1);
+  const closes = new Date(travel);
+  closes.setDate(closes.getDate() - 4);
+  const fmt = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  return { open: TEST_MODE || (today >= opens && today <= closes), opensOn: fmt(opens), closesOn: fmt(closes) };
+}
+/* Always derive "today" in JST (UTC+9) so the date is correct
+   regardless of the visitor's local timezone. */
+/* ── JST date helpers ────────────────────────────────────────────
+   All date comparisons use JST (UTC+9) strings in YYYY-MM-DD format.
+   We never convert back through Date objects to avoid UTC-shift bugs.
+   ─────────────────────────────────────────────────────────────── */
+function todayStrJST() {
+  // Get current instant, shift 9h forward, read UTC components → JST date
+  const jst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const y = jst.getUTCFullYear();
+  const m = String(jst.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(jst.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`; // plain string, no Date object
+}
+function todayJST() {
+  // Returns a Date at midnight JST, safe for < > comparisons with other midnight Dates
+  const s = todayStrJST(); return new Date(s + 'T00:00:00Z');
+}
+function todayStr() { return todayStrJST(); }
+function todayPlusOneMonth() {
+  const s = todayStrJST();                           // e.g. "2026-06-26"
+  const [y, m, d] = s.split('-').map(Number);
+  const next = new Date(Date.UTC(y, m - 1, d));     // m-1: JS months are 0-indexed
+  next.setUTCMonth(next.getUTCMonth() + 1);
+  const ny = next.getUTCFullYear();
+  const nm = String(next.getUTCMonth() + 1).padStart(2, '0');
+  const nd = String(next.getUTCDate()).padStart(2, '0');
+  return `${ny}-${nm}-${nd}`;
+}
+function updateDateHint() {
+  const busId = document.getElementById('f_bus').value;
+  const hint = document.getElementById('dateHint');
+  const dateInput = document.getElementById('f_date');
+  const bus = busById(busId);
+  if (bus) {
+    const todayS = todayStr();
+    const todayPlus4 = (() => {
+      const d = new Date(todayS + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + 4);
+      return d.toISOString().slice(0,10);
+    })();
+    const minDate = [bus.start, todayPlus4].sort().pop();
+    const todayPlus1M = todayPlusOneMonth();
+    const busEndDate = new Date(bus.end + 'T00:00:00Z');
+    busEndDate.setUTCDate(busEndDate.getUTCDate() - 4);
+    const busEndMinus4 = busEndDate.toISOString().slice(0,10);
+    const maxDate = [todayPlus1M, busEndMinus4].sort()[0];
+    dateInput.min = minDate;
+    dateInput.max = maxDate;
+    const chosen = dateInput.value;
+    if (chosen) {
+      const ws = bookingWindowStatus(chosen);
+      if (ws.open) {
+        hint.innerHTML = `<span style="color:var(--moss)">✓ Reservations open</span> · Closes on ${ws.closesOn}`;
+      } else {
+        hint.innerHTML = `<span style="color:var(--red)">✕ Booking window closed (deadline was ${ws.closesOn})</span>`;
+      }
+    } else {
+      hint.textContent = `${bus.label} operates ${bus.periodLabel}. Reservations open 1 month before your travel date and close 4 days prior.`;
+    }
+  } else {
+    hint.textContent = '';
+    dateInput.min = todayStr();
+    dateInput.max = '2026-09-30';
+    dateInput.value = '';
+  }
+  if (TEST_MODE) { dateInput.removeAttribute('min'); dateInput.removeAttribute('max'); if (bus) hint.innerHTML = '<span style="color:#b3261e">⚑ Test mode — any date allowed</span>'; }
+  updateBusSummary();
+}
+function updateBusSummary() {
+  const busId = document.getElementById('f_bus').value;
+  const dir   = document.getElementById('f_dir').value;
+  const bar   = document.getElementById('busSummaryBar');
+  const bus   = busById(busId);
+  if (!bus || !dir) { bar.classList.remove('visible'); document.getElementById('formBusLabel').textContent = "Share a few details and we'll register your place on board. Our team will confirm by email within 24 hours."; return; }
+  const dirLabel = dir === 'arrival' ? 'Airport → Niseko Village' : 'Niseko Village → Airport';
+  document.getElementById('busSummary_name').textContent   = bus.label;
+  document.getElementById('busSummary_dir').textContent    = dirLabel;
+  document.getElementById('busSummary_time').textContent   = bus.times[0];
+  document.getElementById('busSummary_period').textContent = bus.periodLabel;
+  bar.classList.add('visible');
+}
+
+function setFieldError(fieldId, isError) { const wrap = document.querySelector(`.field[data-field="${fieldId}"]`); if (wrap) wrap.classList.toggle('invalid', isError); }
+function clearAllErrors() { document.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid')); }
+
+function validateForm() {
+  clearAllErrors();
+  let firstBad = null;
+  const val = id => document.getElementById(id).value.trim();
+  const fail = id => { setFieldError(id, true); if (!firstBad) firstBad = id; };
+  if (!val('f_first'))  fail('f_first');
+  if (!val('f_last'))   fail('f_last');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f_email'))) fail('f_email');
+  const phone = val('f_phone');
+  if (phone && !/^[\d\s+()\-]{6,}$/.test(phone)) fail('f_phone');
+  if (!val('f_guests')) fail('f_guests');
+  else if (parseInt(val('f_guests')) > 35) { setFieldError('f_guests', true); document.querySelector('.field[data-field="f_guests"] .field-error').textContent = 'Maximum 35 guests per booking.'; if (!firstBad) firstBad = 'f_guests'; }
+  if (!val('f_dir'))    fail('f_dir');
+  if (!val('f_bus'))    fail('f_bus');
+  if (!val('f_hotel'))  fail('f_hotel');
+  const date = val('f_date');
+  const bus = busById(val('f_bus'));
+  if (!date) { fail('f_date'); }
+  else if (!TEST_MODE && bus && (date < bus.start || date > bus.end)) {
+    setFieldError('f_date', true);
+    document.querySelector('.field[data-field="f_date"] .field-error').textContent = `${bus.label} only runs ${bus.periodLabel}. Pick a date in range.`;
+    if (!firstBad) firstBad = 'f_date';
+  } else if (date && !bookingWindowOpen(date)) {
+    setFieldError('f_date', true);
+    const ws = bookingWindowStatus(date);
+    const today = todayJST();
+    const travel = new Date(date + 'T00:00:00Z');
+    let msg;
+    if (today < travel) {
+      msg = `Reservations for this date open on ${ws.opensOn} and close on ${ws.closesOn}.`;
+    } else {
+      msg = `The booking window for this date closed on ${ws.closesOn}. Please contact us directly.`;
+    }
+    document.querySelector('.field[data-field="f_date"] .field-error').textContent = msg;
+    if (!firstBad) firstBad = 'f_date';
+  }
+  if (firstBad) {
+    document.getElementById(firstBad).scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(() => document.getElementById(firstBad).focus(), 300);
+    showToast('Please fix the highlighted fields.', 'error');
+    return false;
+  }
+  return true;
+}
+
+async function submitReservation() {
+  if (!validateForm()) return;
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  const r = {
+    reservationId:document.getElementById('f_reservationId').value.trim(),
+    first:document.getElementById('f_first').value.trim(),
+    last:document.getElementById('f_last').value.trim(),
+    email:document.getElementById('f_email').value.trim(),
+    phone:document.getElementById('f_phone').value.trim(),
+    guests:document.getElementById('f_guests').value,
+    golfBags:document.getElementById('f_golfBags').value,
+    luggage:document.getElementById('f_luggage').value,
+    dir:document.getElementById('f_dir').value,
+    bus:document.getElementById('f_bus').value,
+    date:document.getElementById('f_date').value,
+    hotel:document.getElementById('f_hotel').value,
+    flight:document.getElementById('f_flight').value.trim(),
+    flightType:document.getElementById('f_flighttype').value,
+    notes:document.getElementById('f_notes').value.trim(),
+    source:'guest',
+  };
+  const saved = await addReservation(r);
+  if (btn) { btn.disabled = false; btn.textContent = 'Request Reservation'; }
+  if (!saved) return;
+  showSuccess(saved);
+  resetForm();
+}
+function resetForm() {
+  ['f_reservationId','f_first','f_last','f_email','f_phone','f_flight','f_notes'].forEach(id => document.getElementById(id).value='');
+  ['f_guests','f_golfBags','f_luggage','f_dir','f_bus','f_hotel','f_flighttype'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('f_date').value='';
+  document.getElementById('f_bus').innerHTML='<option value="">Select direction first…</option>';
+  document.getElementById('dateHint').textContent='';
+  document.getElementById('busSummaryBar').classList.remove('visible');
+  document.getElementById('formBusLabel').textContent='Share a few details and we\'ll register your place on board. Our team will confirm by email within 24 hours.';
+  clearAllErrors();
+}
+/* Mantiene la vista en su sitio tras enviar el formulario.
+   Solo desplaza si el resumen no esta visible; nunca sube al header. */
+function keepViewOnSuccess(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const navH = document.querySelector('.nav-tabs')?.offsetHeight || 0;
+  const rect = el.getBoundingClientRect();
+  const topEdge = navH + 8;
+  const alreadyVisible = rect.top >= topEdge && rect.top <= window.innerHeight - 120;
+  if (alreadyVisible) return;
+  const target = Math.max(0, rect.top + window.pageYOffset - navH - 16);
+  window.scrollTo({ top: target, behavior: 'smooth' });
+}
+
+function showSuccess(r) {
+  const dirLabel = r.dir==='arrival' ? 'Airport → Niseko Village' : 'Niseko Village → Airport';
+  document.getElementById('successRef').innerHTML = `
+    <div class="success-ref-row"><span class="k">Reference</span><span class="v code">#${r.id.toUpperCase()}</span></div>
+    <div class="success-ref-row"><span class="k">Name</span><span class="v">${r.first} ${r.last}</span></div>
+    <div class="success-ref-row"><span class="k">Route</span><span class="v">${r.bus} · ${dirLabel}</span></div>
+    <div class="success-ref-row"><span class="k">Date</span><span class="v">${r.date}</span></div>
+    <div class="success-ref-row"><span class="k">Guests</span><span class="v">${r.guests}</span></div>
+    ${r.reservationId ? `<div class="success-ref-row"><span class="k">Hotel Reservation ID</span><span class="v">${r.reservationId}</span></div>` : ''}
+    <div class="success-ref-row"><span class="k">Status</span><span class="v">Pending confirmation</span></div>`;
+  document.getElementById('reserveFormWrap').style.display = 'none';
+  document.getElementById('successScreen').style.display = 'block';
+  keepViewOnSuccess('successScreen');
+}
+
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`panel-${id}`).classList.add('active');
+  document.querySelector(`.nav-tab[data-panel="${id}"]`).classList.add('active');
+  const _navH = document.querySelector('.nav-tabs')?.offsetHeight || 0;
+  const _panel = document.getElementById(`panel-${id}`);
+  const _panelTop = _panel.offsetTop - _navH - 16;
+  window.scrollTo({ top: _panelTop, behavior: 'smooth' });
+  const FOOTER_IMGS = {
+    'reserve':  'Paisaje-Bus-Footer.png',
+    'explore':  'Footer-Discover-Niseko.png',
+    'cancel':   'Cancel-a-reservation.jpg',
+  };
+  const img = document.getElementById('footerHeroImg');
+  if (img) {
+    if (FOOTER_IMGS[id]) {
+      img.src = FOOTER_IMGS[id];
+      img.style.filter = id === 'reserve'
+        ? 'brightness(0.92) contrast(1.04) saturate(1.08)'
+        : id === 'explore'
+          ? 'brightness(0.78) contrast(1.06) saturate(1.1)'
+          : id === 'cancel'
+            ? 'brightness(0.72) contrast(1.06) saturate(1.05)'
+            : 'brightness(0.82) contrast(1.08) saturate(0.85) sepia(0.15)';
+    } else {
+      img.src = _originalFooterSrc;
+      img.style.filter = '';
+    }
+  }
+  const footerHero = document.querySelector('.footer-hero');
+  if (footerHero) {
+    footerHero.classList.toggle('dark-overlay', !['schedule','faq','reserve'].includes(id));
+    footerHero.classList.toggle('reserve-caption', id === 'reserve');
+  }
+  const strip = document.querySelector('.footer-img-strip');
+  if (strip) strip.style.display = ['schedule','faq'].includes(id) ? 'grid' : 'none';
+  const titleEl = document.getElementById('footerHeroTitle');
+  const jpEl    = document.getElementById('footerHeroJp');
+  if (id === 'reserve') {
+    if (titleEl) titleEl.innerHTML = 'Your Journey <em>Begins Here</em>';
+    if (jpEl)    jpEl.textContent  = 'New Chitose Airport ·  Niseko Village';
+  } else if (id === 'explore') {
+    if (titleEl) titleEl.innerHTML = 'The mountain is just <em>the beginning</em>';
+    if (jpEl)    jpEl.textContent  = 'Niseko in Summer · Experiences';
+  } else if (id === 'cancel') {
+    if (titleEl) titleEl.innerHTML = 'Plans change. Niseko <em>waits.</em>';
+    if (jpEl)    jpEl.textContent  = 'Niseko in Summer · Until Next Time';
+  } else {
+    if (titleEl) titleEl.innerHTML = 'Where Hokkaido <em>breathes</em>';
+    if (jpEl)    jpEl.textContent  = '羊蹄山 · 夏';
+  }
+}
+
+function setupReveal() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+}
+
+document.querySelectorAll('.nav-tab').forEach(btn => btn.addEventListener('click', () => switchPanel(btn.dataset.panel)));
+
+document.querySelectorAll('.dir-tab').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.dir-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  schedState.dir = btn.dataset.dir;
+  const buses = schedState.dir==='arrival' ? BUSES_ARRIVAL : BUSES_DEPARTURE;
+  const valid = [...new Set(buses.flatMap(b=>b.periods))];
+  if (!valid.includes(schedState.period)) schedState.period = valid[0];
+  renderSchedule();
+}));
+
+document.getElementById('periodPills').addEventListener('click', e => {
+  const pill = e.target.closest('.period-pill');
+  if (!pill) return;
+  schedState.period = pill.dataset.period;
+  renderSchedule();
+});
+
+document.getElementById('busCards').addEventListener('click', e => {
+  const btn = e.target.closest('.book-btn');
+  if (!btn) return;
+  pendingBus = { id: btn.dataset.busid, dir: btn.dataset.dir };
+  const bus = busById(pendingBus.id);
+  document.getElementById('modalTitle').textContent = `Book ${bus.label}`;
+  document.getElementById('modalSub').textContent = `${pendingBus.dir==='arrival'?'Airport → Niseko':'Niseko → Airport'} · Departs ${bus.times[0]} · ${bus.periodLabel}`;
+  document.getElementById('bookModal').classList.add('open');
+});
+
+document.getElementById('modalClose').addEventListener('click', () => document.getElementById('bookModal').classList.remove('open'));
+document.getElementById('bookModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+document.getElementById('modalGo').addEventListener('click', () => {
+  document.getElementById('bookModal').classList.remove('open');
+  document.getElementById('reserveFormWrap').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+  if (pendingBus) {
+    const bus = busById(pendingBus.id);
+    document.getElementById('f_dir').value = pendingBus.dir;
+    updateBusOptions();
+    document.getElementById('f_bus').value = pendingBus.id;
+    updateDateHint();
+    document.getElementById('formBusLabel').textContent = `Pre-filled: ${bus.label} — ${pendingBus.dir==='arrival'?'Airport → Niseko':'Niseko → Airport'}, departs ${bus.times[0]}`;
+  }
+  switchPanel('reserve');
+  document.getElementById('reserveFormWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('f_dir').addEventListener('change', () => { updateBusOptions(); setFieldError('f_dir', false); pendingBus = null; document.getElementById('formBusLabel').textContent = "Share a few details and we'll register your place on board. Our team will confirm by email within 24 hours."; });
+document.getElementById('f_bus').addEventListener('change', () => { updateDateHint(); setFieldError('f_bus', false); pendingBus = null; document.getElementById('formBusLabel').textContent = "Share a few details and we'll register your place on board. Our team will confirm by email within 24 hours."; });
+document.getElementById('submitBtn').addEventListener('click', submitReservation);
+
+['f_first','f_last','f_email','f_phone','f_guests','f_hotel'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => setFieldError(id, false));
+  el.addEventListener('change', () => setFieldError(id, false));
+});
+// Date field: also refresh booking-window hint whenever the date changes
+const _fdate = document.getElementById('f_date');
+_fdate.addEventListener('input',  () => { setFieldError('f_date', false); updateDateHint(); });
+_fdate.addEventListener('change', () => { setFieldError('f_date', false); updateDateHint(); });
+
+document.getElementById('newBookingBtn').addEventListener('click', () => {
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('reserveFormWrap').style.display = 'block';
+  const _nh = document.querySelector('.nav-tabs')?.offsetHeight || 0;
+  window.scrollTo({ top: document.getElementById('panel-reserve').offsetTop - _nh - 16, behavior: 'smooth' });
+});
+document.getElementById('backToScheduleBtn').addEventListener('click', () => {
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('reserveFormWrap').style.display = 'block';
+  switchPanel('schedule');
+});
+
+/* FAQ accordion: height follows real content, and closing an item ABOVE
+   the clicked one no longer pushes the page down (towards the footer). */
+function faqClose(it, instant){
+  const a = it.querySelector('.faq-a');
+  if (instant) a.style.transition = 'none';
+  a.style.maxHeight = a.scrollHeight + 'px';   /* from 'none' to a number */
+  a.offsetHeight;                               /* force reflow */
+  a.style.maxHeight = '0px';
+  it.classList.remove('open');
+  if (instant) { a.offsetHeight; a.style.transition = ''; }
+}
+function faqOpen(it){
+  const a = it.querySelector('.faq-a');
+  it.classList.add('open');
+  a.style.maxHeight = a.scrollHeight + 'px';
+  a.addEventListener('transitionend', function done(ev){
+    if (ev.propertyName !== 'max-height') return;
+    a.removeEventListener('transitionend', done);
+    if (it.classList.contains('open')) a.style.maxHeight = 'none'; /* images loading later still fit */
+  });
+}
+document.getElementById('faqList').addEventListener('click', e => {
+  if (e.target.classList.contains('lightbox-trigger')) return;
+  if (!e.target.closest('.faq-q')) return;
+  const item = e.target.closest('.faq-item');
+  if (!item) return;
+  const wasOpen = item.classList.contains('open');
+  const topBefore = item.getBoundingClientRect().top;
+  document.querySelectorAll('#faqList .faq-item.open').forEach(i => {
+    if (i === item) return;
+    const above = i.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_FOLLOWING;
+    faqClose(i, !!above);
+  });
+  const shift = item.getBoundingClientRect().top - topBefore;
+  if (shift) window.scrollBy({ top: shift, behavior: 'instant' });
+  if (wasOpen) { faqClose(item, false); return; }
+  faqOpen(item);
+  /* bring the opened question to the top, just below the sticky tabs */
+  const navH = document.querySelector('.nav-tabs')?.offsetHeight || 0;
+  const y = item.getBoundingClientRect().top + window.scrollY - navH - 16;
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+});
+
+let _lang = 'en';
+function t() { return LOCALE[_lang] || LOCALE.en; }
+
+const LOCALE = {};
+
+LOCALE.en = {
+  htmlLang:'en',
+  /* dynamic render strings */
+  bookBtn:'Book this bus →', comingSoon:'Coming soon', periodEnded:'Period ended',
+  travelTime:(d)=>`Travel time ${d}`, noBuses:'No buses scheduled for this period and direction.',
+  exploreArrow:'Explore',
+  modalGo:'Go to Reservation Form →',
+  modalBusDir:(b,dir)=>`${dir==='arrival'?'Airport → Niseko':'Niseko → Airport'} · Departs ${b.times[0]} · ${b.periodLabel}`,
+  reserveSubtitle:"Share a few details and we'll register your place on board. Our team will confirm by email within 24 hours.",
+  optBusSel:'Select direction first…', optBusNone:'No buses available for this period',
+  optHotelSel:'Select…', optFtSel:'Select…', optFtDom:'Domestic', optFtIntl:'International',
+  dirLabel:(dir)=>dir==='arrival'?'Airport → Niseko Village':'Niseko Village → Airport',
+  prefilled:(bus,dir)=>`Pre-filled: ${bus.label} — ${dir==='arrival'?'Airport → Niseko':'Niseko → Airport'}, departs ${bus.times[0]}`,
+  successRef:'Reference', successName:'Name', successRoute:'Route', successDate:'Date',
+  successGuests:'Guests', successHotelId:'Hotel Reservation ID', successStatus:'Pending confirmation',
+  toastFix:'Please fix the highlighted fields.',
+  toastStorageFull:'Storage full — cannot save.', toastSaveFail:'Could not save reservation.',
+  errMaxGuests:'Maximum 35 guests per booking.',
+  errBusRange:(bus)=>`${bus.label} only runs ${bus.periodLabel}. Pick a date in range.`,
+  errWindowFuture:(ws)=>`Reservations for this date open on ${ws.opensOn} and close on ${ws.closesOn}.`,
+  errWindowPast:(ws)=>`The booking window for this date closed on ${ws.closesOn}. Please contact us directly.`,
+  dateHintText:(bus)=>`${bus.label} operates ${bus.periodLabel}. Reservations open 1 month before your travel date and close 4 days prior.`,
+  dateHintOpen:(ws)=>`<span style="color:var(--moss)">✓ Reservations open</span> · Closes on ${ws.closesOn}`,
+  dateHintClosed:(ws)=>`<span style="color:var(--red)">✕ Booking window closed (deadline was ${ws.closesOn})</span>`,
+  cancelSuccessRef:(r)=>`<div class="success-ref-row"><span class="k">Booking Ref.</span><span class="v code">${r.ref}</span></div><div class="success-ref-row"><span class="k">Name</span><span class="v">${r.first} ${r.last}</span></div><div class="success-ref-row"><span class="k">Travel Date</span><span class="v">${r.date}</span></div><div class="success-ref-row"><span class="k">Status</span><span class="v">Pending review</span></div>`,
+  footerCaptions:{
+    schedule:{jp:'羊蹄山 · 夏',h3:'Where Hokkaido <em>breathes</em>'},
+    reserve:{jp:'New Chitose Airport · Niseko Village',h3:'Your Journey <em>Begins Here</em>'},
+    explore:{jp:'Niseko in Summer · Experiences',h3:'The mountain is just <em>the beginning</em>'},
+    cancel:{jp:'Niseko in Summer · Until Next Time',h3:'Plans change. Niseko <em>waits.</em>'},
+    faq:{jp:'羊蹄山 · 夏',h3:'Where Hokkaido <em>breathes</em>'},
+  },
+  periodLabels:{ p1:'May 15 – Jun 15', p2:'Jun 16 – Aug 31', p3:'Sep 1 – Sep 30' },
+  plhGuests:'Max 35 guests',
+};
+
+LOCALE.ja = {
+  htmlLang:'ja',
+  heroEyebrow:'ニセコの夏 — Summer in Niseko',
+  heroTitle:'ニセコビレッジ<br><em>バス</em><br>2027年夏',
+  heroSub:'新千歳空港<span class="dot"></span>ヒルトンニセコビレッジ<span class="dot"></span>北海道の緑豊かな大地を横断する絶景ドライブ',
+  heroBadge1:'2027年 夏', heroBadge2:'5月15日 — 9月30日', heroBadge3:'要予約',
+  noticeHTML:'<strong>要予約。</strong>予約受付はご来館の1ヶ月前より開始し、旅行4日前に締め切ります。予約がない場合、バスは運行しません。ニセコビレッジのホテルにご宿泊のゲスト専用サービスです。',
+  navSchedule:'時刻表', navReserve:'予約する', navExplore:'ニセコを探索', navCancel:'予約をキャンセル', navFaq:'よくある質問',
+  schedKicker:'時刻表 · Timetable', schedH2:'<em>北海道</em>の夏の旅',
+  schedP:'新千歳空港と羊蹄山麓を結ぶ直行バスサービス。方向と旅行期間を選んでシーズンのスケジュールをご確認ください。',
+  schedPdf:'↓ PDFスケジュールをダウンロード',
+  dirArrival:'✈ 新千歳空港 → ニセコビレッジ', dirDeparture:'🏔 ニセコビレッジ → 新千歳空港',
+  periodLabel:'旅行期間',
+  bookBtn:'このバスを予約 →', comingSoon:'近日公開', periodEnded:'期間終了',
+  travelTime:(d)=>`所要時間 ${d}`, noBuses:'この期間・方向のバスは運行しておりません。',
+  exploreArrow:'探索する',
+  modalGo:'予約フォームへ →',
+  modalBusDir:(b,dir)=>`${dir==='arrival'?'空港→ニセコ':'ニセコ→空港'} · 出発 ${b.times[0]} · ${b.periodLabel}`,
+  reserveEyebrow:'予約 · Reservation', reserveTitle:'<em>座席</em>を予約する',
+  reserveSubtitle:'必要事項をご入力ください。乗車手続き後、24時間以内にメールにてご確認いたします。',
+  noticeHead:'重要なお知らせ',
+  noticeBodyHTML:'<strong>国際線</strong>でご到着のお客様は、バス出発の15分前までに2階到着ホール前にお集まりください。<strong>国内線</strong>でご到着のお客様は、バスのりば98番へ直接お進みください。',
+  connectingTime:'乗り継ぎ時間の目安',
+  colFlight:'フライト種別', colFromPlane:'飛行機からバスまで', colFromBus:'バスから飛行機まで',
+  rowDomestic:'国内線', rowIntl:'国際線',
+  secGuest:'ゲスト情報',
+  lblResId:'予約ID', lblFirst:'名（予約時の氏名）*', lblLast:'姓（予約時の氏名）*',
+  lblEmail:'メールアドレス *', lblPhone:'電話番号', lblGuests:'ゲスト人数 *',
+  lblGolf:'ゴルフバッグの数', lblLuggage:'荷物の数',
+  secJourney:'旅程の詳細', lblDirection:'方向 *',
+  optDirSel:'選択してください', optDirArr:'新千歳空港 → ニセコビレッジ', optDirDep:'ニセコビレッジ → 新千歳空港',
+  lblBus:'バス便 *', optBusSel:'先に方向を選択してください', optBusNone:'この期間のバスはありません',
+  lblDate:'旅行日 *', lblHotel:'ホテル *', optHotelSel:'選択してください',
+  lblFlight:'フライト番号', lblFlightType:'フライト種別',
+  optFtSel:'選択してください', optFtDom:'国内線', optFtIntl:'国際線',
+  lblNotes:'特別リクエスト / メモ', notesPlh:'車椅子サポート、食事制限、ベビーシートなど…',
+  submitBtn:'予約を確定する →',
+  sumBus:'バス便', sumDir:'方向', sumDep:'出発', sumPeriod:'期間',
+  dirLabel:(dir)=>dir==='arrival'?'空港 → ニセコビレッジ':'ニセコビレッジ → 空港',
+  prefilled:(bus,dir)=>`事前入力: ${bus.label} — ${dir==='arrival'?'空港→ニセコ':'ニセコ→空港'}、出発 ${bus.times[0]}`,
+  successTitle:'<em>予約を受け付けました</em>',
+  successSub:'座席リクエストが登録されました。まもなくメールにて予約確認をお送りします。参照番号を大切に保管してください。',
+  successRef:'参照番号', successName:'氏名', successRoute:'ルート', successDate:'旅行日',
+  successGuests:'ゲスト人数', successHotelId:'ホテル予約ID', successStatus:'確認待ち',
+  newBookingBtn:'別の予約をする', backSchedBtn:'時刻表に戻る',
+  exploreKicker:'探索 · Discover', exploreH2:'<em>ニセコ</em>の夏',
+  exploreP:'山の向こうには、5月から9月にかけて一流のレストラン、温泉、ゴルフ、静かな自然が待っています。',
+  cancelKicker:'キャンセル · Cancellation', cancelH2:'<em>予約</em>をキャンセルする',
+  cancelP:'ご予定の変更が必要ですか？以下よりリクエストを送信してください。24時間以内にメールにてキャンセルの確認をいたします。',
+  cancelEyebrow:'キャンセル申請 · Cancellation Request', cancelTitle:'<em>申請内容</em>',
+  cancelSubtitle:'ご予約の詳細をご入力ください。後はこちらで対応いたします。',
+  secBooking:'予約詳細',
+  lblRef:'予約参照番号 *', lblCFirst:'名 *', lblCLast:'姓 *', lblCEmail:'メールアドレス *',
+  lblCDate:'旅行日 *', lblCHotel:'ホテル', lblReason:'キャンセル理由 *',
+  reasonPlh:'キャンセル理由を簡単にご説明ください。',
+  confirmChk:'バスの予約をキャンセルします *', cancelSubmit:'キャンセルリクエストを送信 →',
+  cancelSuccessTitle:'<em>申請が送信されました</em>',
+  cancelSuccessSub:'キャンセルリクエストを受け付けました。24時間以内にメールにてご確認いたします。',
+  cancelBack:'時刻表に戻る',
+  cancelSuccessRef:(r)=>`<div class="success-ref-row"><span class="k">予約参照番号</span><span class="v code">${r.ref}</span></div><div class="success-ref-row"><span class="k">氏名</span><span class="v">${r.first} ${r.last}</span></div><div class="success-ref-row"><span class="k">旅行日</span><span class="v">${r.date}</span></div><div class="success-ref-row"><span class="k">ステータス</span><span class="v">確認待ち</span></div>`,
+  faqSectionTitle:'よくある質問 &amp; サービス規約 <em>FAQ</em>',
+  faqCaptionTitle:'ニセコビレッジ リムジンバス',
+  faqCaptionBody:'新千歳空港とニセコビレッジのホテルを結ぶ快適な直行サービス。',
+  termsTitle:'バスサービス <em>利用規約</em>',
+  terms:[
+    '<strong>運行期間：</strong>5月15日〜9月30日。',
+    'ご予約はご来館の1ヶ月前より受け付けます。',
+    'このサービスはニセコビレッジ内のホテルにご宿泊のゲスト専用です。',
+    'ご予約はウェブサイトより旅行4日前まで受け付けます。',
+    '予約なしではバスにご乗車いただけませんのでご注意ください。',
+    'なお、予約がない場合はバスを運行しない場合があります。',
+  ],
+  faqs:[
+    {q:'新千歳空港での集合場所はどこですか？',a:'国際線ターミナルビル1階の<strong>バスのりば98番</strong>です。国内線ターミナルからは、2階の連絡通路（動く歩道あり）を通って国際線ターミナルへ移動し、1階に降りてください。<br>国際線ご利用のお客様は2階到着ホール前が集合場所となります。全員そろい次第、バスのりばへご案内します。<br><br><img src="Bus-stop.png" alt="新千歳空港バスのりば98番マップ" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="クリックして拡大"><img src="Bus-stop-98.png" alt="国内線ターミナルからバスのりば98番までのルート" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="クリックして拡大">'},
+    {q:'フライトが遅延した場合、バスは待ってくれますか？',a:'原則として、バスは定刻に出発します。次のバスに空席がある場合は手配いたします。それ以外の場合は、ゲスト自身でニセコへの移動（JR等）が必要となります。'},
+    {q:'座席は指定できますか？',a:'座席は先着順となります。事前の座席予約はできませんが、特別なサポートが必要な場合（車椅子ご利用等）はお知らせください。'},
+    {q:'バス内にトイレはありますか？',a:'車内にトイレはございません。ただし、途中でトイレ休憩を1回設けています。'},
+    {q:'バス内で飲食はできますか？',a:'お水やお茶はご利用いただけます。その他の飲食はご遠慮ください。お子様のスナックは、座席を汚さない範囲で構いません。<strong>ソフトクリームはお断りしています。</strong>'},
+    {q:'ペットは同乗できますか？',a:'いいえ、バスへのペットの同乗はお断りしています。'},
+    {q:'どのくらいの乗り継ぎ時間が必要ですか？',a:'<table class="conn-table"><thead><tr><th>フライト種別</th><th>飛行機→バス</th><th>バス→飛行機</th></tr></thead><tbody><tr><td>国内線</td><td><strong>60分</strong></td><td><strong>60分</strong></td></tr><tr><td>国際線</td><td><strong>90分</strong></td><td><strong>120分</strong></td></tr></tbody></table><br>注：事業者は管理外の事由による遅延に対して責任を負いません。'},
+  ],
+  footerCaptions:{
+    schedule:{jp:'羊蹄山 · 夏',h3:'北海道が<em>息づく</em>場所'},
+    reserve:{jp:'新千歳空港 · ニセコビレッジ',h3:'あなたの旅は<em>ここから始まる</em>'},
+    explore:{jp:'夏のニセコ · 体験',h3:'山は<em>始まりに過ぎない</em>'},
+    cancel:{jp:'夏のニセコ · またいつか',h3:'予定は変わる。ニセコは<em>待っている。</em>'},
+    faq:{jp:'羊蹄山 · 夏',h3:'北海道が<em>息づく</em>場所'},
+  },
+  footerBrand:'ニセコビレッジ', footerTagline:'2027年 夏', footerBack:'トップへ戻る ↑',
+  footerMeta:['© 2027 ニセコビレッジ株式会社','ニセコビレッジ','北海道、日本'],
+  toastFix:'ハイライトされたフィールドを修正してください。',
+  toastStorageFull:'ストレージが一杯です。', toastSaveFail:'保存できませんでした。',
+  lightboxHint:'クリックまたはESCキーで閉じる',
+  storageWarn:'⚠ ブラウザがローカルストレージをブロックしています（プライベートモード？）。このデバイスでは予約を保存できません。',
+  errMaxGuests:'1回の予約は最大35名までです。',
+  errBusRange:(bus)=>`${bus.label}は${bus.periodLabel}のみ運行します。期間内の日付を選んでください。`,
+  errWindowFuture:(ws)=>`この日の予約受付は${ws.opensOn}から${ws.closesOn}までです。`,
+  errWindowPast:(ws)=>`この日の予約受付は${ws.closesOn}に終了しました。直接お問い合わせください。`,
+  dateHintText:(bus)=>`${bus.label}は${bus.periodLabel}に運行します。旅行1ヶ月前から4日前まで予約可能です。`,
+  dateHintOpen:(ws)=>`<span style="color:var(--moss)">✓ 予約受付中</span> · 締め切り: ${ws.closesOn}`,
+  dateHintClosed:(ws)=>`<span style="color:var(--red)">✕ 予約受付終了（締め切り: ${ws.closesOn}）</span>`,
+  periodLabels:{ p1:'5月15日 – 6月15日', p2:'6月16日 – 8月31日', p3:'9月1日 – 9月30日' },
+  plhGuests:'最大35名',
+};
+
+LOCALE.ko = {
+  htmlLang:'ko',
+  heroEyebrow:'니세코의 여름 — Summer in Niseko',
+  heroTitle:'니세코 빌리지 <em>버스</em><br>2027년 여름',
+  heroSub:'신치토세 공항<span class="dot"></span>힐튼 니세코 빌리지<span class="dot"></span>홋카이도의 초록빛 대지를 가로지르는 경치 좋은 여정',
+  heroBadge1:'2027년 여름', heroBadge2:'5월 15일 — 9월 30일', heroBadge3:'예약 필수',
+  noticeHTML:'<strong>예약이 필요합니다.</strong> 예약은 방문 1개월 전부터 가능하며, 여행 4일 전에 마감됩니다. 예약이 없으면 버스는 운행하지 않습니다. 니세코 빌리지 호텔 투숙객 전용 서비스입니다.',
+  navSchedule:'시간표', navReserve:'좌석 예약', navExplore:'니세코 탐험', navCancel:'예약 취소', navFaq:'자주 묻는 질문',
+  schedKicker:'시간표 · Timetable', schedH2:'<em>홋카이도</em>의 여름 여행',
+  schedP:'신치토세 공항과 요테이산 기슭을 잇는 직행 버스 서비스입니다. 방향과 여행 기간을 선택하여 시즌 일정을 확인하세요.',
+  schedPdf:'↓ PDF 시간표 다운로드',
+  dirArrival:'✈ 신치토세 공항 → 니세코 빌리지', dirDeparture:'🏔 니세코 빌리지 → 신치토세 공항',
+  periodLabel:'여행 기간',
+  bookBtn:'이 버스 예약하기 →', comingSoon:'곧 공개', periodEnded:'운행 종료',
+  travelTime:(d)=>`소요 시간 ${d}`, noBuses:'이 기간 및 방향의 버스 운행이 없습니다.',
+  exploreArrow:'탐험하기',
+  modalGo:'예약 양식으로 이동 →',
+  modalBusDir:(b,dir)=>`${dir==='arrival'?'공항→니세코':'니세코→공항'} · 출발 ${b.times[0]} · ${b.periodLabel}`,
+  reserveEyebrow:'예약 · Reservation', reserveTitle:'<em>좌석</em> 예약하기',
+  reserveSubtitle:'세부 정보를 입력하시면 탑승 좌석을 등록해 드립니다. 저희 팀이 24시간 이내에 이메일로 확인해 드립니다.',
+  noticeHead:'중요 안내',
+  noticeBodyHTML:'<strong>국제선</strong> 이용 승객은 버스 출발 최소 15분 전까지 2층 도착 홀 앞에 집결해 주세요. <strong>국내선</strong> 이용 승객은 버스 정류장 98번으로 직접 이동하시기 바랍니다.',
+  connectingTime:'연결 소요 시간',
+  colFlight:'항공편 종류', colFromPlane:'비행기에서 버스까지', colFromBus:'버스에서 비행기까지',
+  rowDomestic:'국내선', rowIntl:'국제선',
+  secGuest:'투숙객 정보',
+  lblResId:'예약 ID', lblFirst:'이름(예약 시 성명) *', lblLast:'성(예약 시 성명) *',
+  lblEmail:'이메일 *', lblPhone:'전화번호', lblGuests:'투숙 인원 *',
+  lblGolf:'골프백 수', lblLuggage:'수하물 수',
+  secJourney:'여정 상세', lblDirection:'방향 *',
+  optDirSel:'선택하세요', optDirArr:'신치토세 공항 → 니세코 빌리지', optDirDep:'니세코 빌리지 → 신치토세 공항',
+  lblBus:'버스편 *', optBusSel:'먼저 방향을 선택하세요', optBusNone:'이 기간에 운행 가능한 버스가 없습니다',
+  lblDate:'여행 날짜 *', lblHotel:'호텔 *', optHotelSel:'선택하세요',
+  lblFlight:'항공편 번호', lblFlightType:'항공편 종류',
+  optFtSel:'선택하세요', optFtDom:'국내선', optFtIntl:'국제선',
+  lblNotes:'특별 요청 / 메모', notesPlh:'휠체어 지원, 식이 요건, 유아용 시트 등…',
+  submitBtn:'예약 확정하기 →',
+  sumBus:'버스편', sumDir:'방향', sumDep:'출발', sumPeriod:'기간',
+  dirLabel:(dir)=>dir==='arrival'?'공항 → 니세코 빌리지':'니세코 빌리지 → 공항',
+  prefilled:(bus,dir)=>`사전 입력: ${bus.label} — ${dir==='arrival'?'공항→니세코':'니세코→공항'}, 출발 ${bus.times[0]}`,
+  successTitle:'<em>예약이 접수되었습니다</em>',
+  successSub:'좌석 요청이 등록되었습니다. 곧 이메일로 예약 확인을 보내 드리겠습니다. 참조 번호를 안전하게 보관해 주세요.',
+  successRef:'참조 번호', successName:'성명', successRoute:'노선', successDate:'여행 날짜',
+  successGuests:'인원', successHotelId:'호텔 예약 ID', successStatus:'확인 대기 중',
+  newBookingBtn:'다른 예약하기', backSchedBtn:'시간표로 돌아가기',
+  exploreKicker:'탐험 · Discover', exploreH2:'<em>니세코</em>의 여름',
+  exploreP:'산 너머에는 5월부터 9월까지 세계적인 다이닝, 온천, 골프, 고요한 자연이 기다리고 있습니다.',
+  cancelKicker:'취소 · Cancellation', cancelH2:'<em>예약</em> 취소하기',
+  cancelP:'일정 조정이 필요하신가요? 아래에 요청을 제출하시면 저희 팀이 24시간 이내에 이메일로 취소를 확인해 드립니다.',
+  cancelEyebrow:'취소 요청 · Cancellation Request', cancelTitle:'<em>요청 내용</em>',
+  cancelSubtitle:'예약 상세 정보를 입력해 주시면 나머지는 저희가 처리해 드립니다.',
+  secBooking:'예약 상세',
+  lblRef:'예약 참조 번호 *', lblCFirst:'이름 *', lblCLast:'성 *', lblCEmail:'이메일 *',
+  lblCDate:'여행 날짜 *', lblCHotel:'호텔', lblReason:'취소 사유 *',
+  reasonPlh:'예약을 취소하는 이유를 간략히 설명해 주세요.',
+  confirmChk:'버스 예약을 취소하겠습니다 *', cancelSubmit:'취소 요청 제출하기 →',
+  cancelSuccessTitle:'<em>요청이 제출되었습니다</em>',
+  cancelSuccessSub:'취소 요청이 접수되었습니다. 24시간 이내에 이메일로 확인해 드리겠습니다.',
+  cancelBack:'시간표로 돌아가기',
+  cancelSuccessRef:(r)=>`<div class="success-ref-row"><span class="k">예약 참조 번호</span><span class="v code">${r.ref}</span></div><div class="success-ref-row"><span class="k">성명</span><span class="v">${r.first} ${r.last}</span></div><div class="success-ref-row"><span class="k">여행 날짜</span><span class="v">${r.date}</span></div><div class="success-ref-row"><span class="k">상태</span><span class="v">검토 대기 중</span></div>`,
+  faqSectionTitle:'자주 묻는 질문 &amp; 이용 약관 <em>FAQ</em>',
+  faqCaptionTitle:'니세코 빌리지 리무진 버스',
+  faqCaptionBody:'신치토세 공항과 니세코 빌리지 호텔을 연결하는 편안한 직행 서비스.',
+  termsTitle:'버스 서비스 <em>이용 약관</em>',
+  terms:[
+    '<strong>운행 기간:</strong> 5월 15일 – 9월 30일.',
+    '예약은 방문 1개월 전부터 가능합니다.',
+    '이 서비스는 니세코 빌리지 내 호텔 투숙객 전용입니다.',
+    '웹사이트에서 여행 4일 전까지 예약 가능합니다.',
+    '예약 없이는 버스에 탑승할 수 없음을 유의해 주세요.',
+    '또한, 예약이 없는 경우 버스는 운행하지 않습니다.',
+  ],
+  faqs:[
+    {q:'신치토세 공항에서 집합 장소는 어디인가요?',a:'국제선 터미널 빌딩 1층 <strong>버스 정류장 98번</strong>입니다. 국내선 터미널에서 오시는 경우, 2층 연결 통도(무빙워크 이용 가능)를 통해 국제선 터미널로 이동한 후 1층으로 내려오세요.<br>국제선 이용 승객의 집합 장소는 2층 도착 홀 앞입니다. 전원 확인 후 함께 버스 정류장으로 이동합니다.<br><br><img src="Bus-stop.png" alt="신치토세 공항 버스 정류장 98번 지도" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="클릭하여 확대"><img src="Bus-stop-98.png" alt="국내선 터미널에서 98번 버스 정류장까지 가는 길" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="클릭하여 확대">'},
+    {q:'항공편이 지연된 경우 버스가 기다려 주나요?',a:'원칙적으로 버스는 정시에 출발합니다. 다음 버스에 좌석이 있는 경우 수배해 드리지만, 그렇지 않은 경우 투숙객께서 직접 니세코로 이동하셔야 합니다(예: JR 열차 등).'},
+    {q:'좌석이 지정되어 있나요?',a:'좌석은 선착순입니다. 사전 좌석 예약은 불가하지만, 특별 지원이 필요한 경우(예: 휠체어 이용객)에는 미리 알려주세요.'},
+    {q:'버스 내에 화장실이 있나요?',a:'차내 화장실은 없습니다. 단, 여정 중 화장실 휴게 정차를 1회 합니다.'},
+    {q:'버스 내에서 음식을 먹거나 음료를 마실 수 있나요?',a:'물과 차는 허용됩니다. 그 외 음식과 음료는 삼가 주시기 바랍니다. 좌석을 깨끗하게 유지하는 한 아이들의 간식은 괜찮습니다. <strong>소프트아이스크림은 허용되지 않습니다.</strong>'},
+    {q:'반려동물을 동반할 수 있나요?',a:'아니요, 버스 내 반려동물 동반은 허용되지 않습니다.'},
+    {q:'얼마나 일찍 연결 편을 잡아야 하나요?',a:'<table class="conn-table"><thead><tr><th>항공편 종류</th><th>비행기→버스</th><th>버스→비행기</th></tr></thead><tbody><tr><td>국내선</td><td><strong>60분</strong></td><td><strong>60분</strong></td></tr><tr><td>국제선</td><td><strong>90분</strong></td><td><strong>120분</strong></td></tr></tbody></table><br>참고: 운영사는 통제 불가한 사유로 인한 지연에 대해 책임을 지지 않습니다.'},
+  ],
+  footerCaptions:{
+    schedule:{jp:'羊蹄山 · 여름',h3:'홋카이도가 <em>숨 쉬는</em> 곳'},
+    reserve:{jp:'신치토세 공항 · 니세코 빌리지',h3:'당신의 여정은 <em>여기서 시작됩니다</em>'},
+    explore:{jp:'여름의 니세코 · 체험',h3:'산은 <em>시작일 뿐입니다</em>'},
+    cancel:{jp:'여름의 니세코 · 다음에 또',h3:'계획은 바뀌어도. 니세코는 <em>기다립니다.</em>'},
+    faq:{jp:'羊蹄山 · 여름',h3:'홋카이도가 <em>숨 쉬는</em> 곳'},
+  },
+  footerBrand:'니세코 빌리지', footerTagline:'2027년 여름', footerBack:'맨 위로 ↑',
+  footerMeta:['© 2027 Niseko Village Co., Ltd.','ニセコビレッジ','일본 홋카이도'],
+  toastFix:'강조 표시된 필드를 수정해 주세요.',
+  toastStorageFull:'저장 공간이 가득 찼습니다.', toastSaveFail:'저장할 수 없습니다.',
+  lightboxHint:'아무 곳이나 클릭하거나 ESC를 눌러 닫으세요',
+  storageWarn:'⚠ 브라우저가 로컬 스토리지를 차단하고 있습니다(개인 모드?). 이 기기에서는 예약을 저장할 수 없습니다.',
+  errMaxGuests:'1회 예약 최대 인원은 35명입니다.',
+  errBusRange:(bus)=>`${bus.label}은(는) ${bus.periodLabel}에만 운행합니다. 해당 기간 내 날짜를 선택해 주세요.`,
+  errWindowFuture:(ws)=>`이 날짜의 예약은 ${ws.opensOn}부터 ${ws.closesOn}까지 가능합니다.`,
+  errWindowPast:(ws)=>`이 날짜의 예약 기간은 ${ws.closesOn}에 종료되었습니다. 직접 문의해 주세요.`,
+  dateHintText:(bus)=>`${bus.label}은(는) ${bus.periodLabel}에 운행합니다. 여행 1개월 전부터 4일 전까지 예약 가능합니다.`,
+  dateHintOpen:(ws)=>`<span style="color:var(--moss)">✓ 예약 가능</span> · 마감: ${ws.closesOn}`,
+  dateHintClosed:(ws)=>`<span style="color:var(--red)">✕ 예약 마감 (마감일: ${ws.closesOn})</span>`,
+  periodLabels:{ p1:'5월 15일 – 6월 15일', p2:'6월 16일 – 8월 31일', p3:'9월 1일 – 9월 30일' },
+  plhGuests:'최대 35명',
+};
+
+LOCALE.zh = {
+  htmlLang:'zh-Hans',
+  heroEyebrow:'倶知安之夏 — Summer in Niseko',
+  heroTitle:'倶知安村<br><em>巴士</em><br>2027年夏季',
+  heroSub:'新千岁机场<span class="dot"></span>希尔顿倶知安村<span class="dot"></span>穿越北海道翠绿大地的如画旅途',
+  heroBadge1:'2027年夏季', heroBadge2:'5月15日 — 9月30日', heroBadge3:'须提前预约',
+  noticeHTML:'<strong>须提前预约。</strong>预约在访问前一个月开放，并在旅行前4天截止。如无预约，巴士将不运行。本服务仅限入住倶知安村酒店的宾客使用。',
+  navSchedule:'时刻表', navReserve:'预订座位', navExplore:'探索倶知安', navCancel:'取消预约', navFaq:'常见问题',
+  schedKicker:'时刻表 · Timetable', schedH2:'<em>北海道</em>夏季之旅',
+  schedP:'新千岁机场与羊蹄山山麓之间的直达大巴服务。请选择您的方向和出行时段，查看本季度的时刻表。',
+  schedPdf:'↓ 下载PDF时刻表',
+  dirArrival:'✈ 新千岁机场 → 倶知安村', dirDeparture:'🏔 倶知安村 → 新千岁机场',
+  periodLabel:'出行时段',
+  bookBtn:'预订此班次 →', comingSoon:'即将开放', periodEnded:'运营已结束',
+  travelTime:(d)=>`行程时间 ${d}`, noBuses:'该时段及方向暂无班次运行。',
+  exploreArrow:'探索',
+  modalGo:'前往预约表单 →',
+  modalBusDir:(b,dir)=>`${dir==='arrival'?'机场→倶知安':'倶知安→机场'} · 出发 ${b.times[0]} · ${b.periodLabel}`,
+  reserveEyebrow:'预约 · Reservation', reserveTitle:'预订<em>座位</em>',
+  reserveSubtitle:'请填写以下信息，我们将为您登记座位。我们的团队将在24小时内通过电子邮件确认您的预订。',
+  noticeHead:'重要通知',
+  noticeBodyHTML:'搭乘<strong>国际航班</strong>抵达的旅客须在巴士出发前至少15分钟集合于二楼到达大厅前。搭乘<strong>国内航班</strong>的旅客请直接前往98号巴士站。',
+  connectingTime:'衔接时间参考',
+  colFlight:'航班类型', colFromPlane:'从飞机到巴士', colFromBus:'从巴士到飞机',
+  rowDomestic:'国内航班', rowIntl:'国际航班',
+  secGuest:'宾客信息',
+  lblResId:'预约编号', lblFirst:'名字（与预约一致）*', lblLast:'姓氏（与预约一致）*',
+  lblEmail:'电子邮箱 *', lblPhone:'电话号码', lblGuests:'乘客人数 *',
+  lblGolf:'高尔夫球袋数量', lblLuggage:'行李件数',
+  secJourney:'行程详情', lblDirection:'方向 *',
+  optDirSel:'请选择', optDirArr:'新千岁机场 → 倶知安村', optDirDep:'倶知安村 → 新千岁机场',
+  lblBus:'班次 *', optBusSel:'请先选择方向', optBusNone:'该时段暂无可用班次',
+  lblDate:'出行日期 *', lblHotel:'酒店 *', optHotelSel:'请选择',
+  lblFlight:'航班号', lblFlightType:'航班类型',
+  optFtSel:'请选择', optFtDom:'国内航班', optFtIntl:'国际航班',
+  lblNotes:'特殊需求 / 备注', notesPlh:'轮椅协助、饮食需求、婴儿座椅等…',
+  submitBtn:'确认预约 →',
+  sumBus:'班次', sumDir:'方向', sumDep:'出发', sumPeriod:'时段',
+  dirLabel:(dir)=>dir==='arrival'?'机场 → 倶知安村':'倶知安村 → 机场',
+  prefilled:(bus,dir)=>`已预填: ${bus.label} — ${dir==='arrival'?'机场→倶知安':'倶知安→机场'}，出发 ${bus.times[0]}`,
+  successTitle:'<em>预约已接收</em>',
+  successSub:'您的座位申请已登记。我们的团队将很快通过电子邮件确认您的预约。请妥善保管您的参考编号。',
+  successRef:'参考编号', successName:'姓名', successRoute:'路线', successDate:'出行日期',
+  successGuests:'人数', successHotelId:'酒店预约编号', successStatus:'待确认',
+  newBookingBtn:'再次预约', backSchedBtn:'返回时刻表',
+  exploreKicker:'探索 · Discover', exploreH2:'<em>倶知安</em>的夏天',
+  exploreP:'山的另一边，5月至9月期间，世界级美食、温泉、高尔夫球场和宁静的自然等待着您。',
+  cancelKicker:'取消 · Cancellation', cancelH2:'取消<em>预约</em>',
+  cancelP:'需要调整行程吗？请在下方提交申请，我们的团队将在24小时内通过电子邮件确认取消。',
+  cancelEyebrow:'取消申请 · Cancellation Request', cancelTitle:'您的<em>申请</em>',
+  cancelSubtitle:'请提供您的预约详情，其余事宜由我们处理。',
+  secBooking:'预约详情',
+  lblRef:'预约参考编号 *', lblCFirst:'名字 *', lblCLast:'姓氏 *', lblCEmail:'电子邮箱 *',
+  lblCDate:'出行日期 *', lblCHotel:'酒店', lblReason:'取消原因 *',
+  reasonPlh:'请简要说明取消预约的原因。',
+  confirmChk:'我要取消巴士预约 *', cancelSubmit:'提交取消申请 →',
+  cancelSuccessTitle:'<em>申请已提交</em>',
+  cancelSuccessSub:'您的取消申请已收到。我们将在24小时内通过电子邮件进行确认。',
+  cancelBack:'返回时刻表',
+  cancelSuccessRef:(r)=>`<div class="success-ref-row"><span class="k">预约参考编号</span><span class="v code">${r.ref}</span></div><div class="success-ref-row"><span class="k">姓名</span><span class="v">${r.first} ${r.last}</span></div><div class="success-ref-row"><span class="k">出行日期</span><span class="v">${r.date}</span></div><div class="success-ref-row"><span class="k">状态</span><span class="v">审核中</span></div>`,
+  faqSectionTitle:'常见问题 &amp; 服务条款 <em>FAQ</em>',
+  faqCaptionTitle:'倶知安村豪华大巴',
+  faqCaptionBody:'新千岁机场与倶知安村酒店之间的舒适直达服务。',
+  termsTitle:'巴士服务<em>条款与条件</em>',
+  terms:[
+    '<strong>运营时间：</strong>5月15日 – 9月30日。',
+    '预约可在访问前一个月开始进行。',
+    '本服务仅供入住倶知安村酒店的宾客使用。',
+    '可通过本网站在旅行前四天内进行预约。',
+    '请注意，未预约将无法乘车。',
+    '此外，如无预约，巴士将不予运行。',
+  ],
+  faqs:[
+    {q:'在新千岁机场的集合地点在哪里？',a:'位于国际线航站楼1楼的<strong>98号巴士站</strong>。从国内线航站楼出发，需经由2楼连接通道（设有自动步道）前往国际线航站楼，再下到1楼。<br>乘坐国际航班抵达的旅客，集合地点为2楼到达大厅前——确认人员到齐后，统一前往巴士站。<br><br><img src="Bus-stop.png" alt="新千岁机场巴士站98号地图" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="点击放大"><img src="Bus-stop-98.png" alt="从国内线航站楼前往98号巴士站的路线" class="lightbox-trigger" style="width:100%;max-width:100%;display:block;margin-top:8px;border:1px solid var(--hairline);" title="点击放大">'},
+    {q:'航班延误了，巴士会等吗？',a:'原则上，巴士按时出发。如果下一班巴士有空位，我们将为您安排；否则，宾客需自行前往倶知安（如乘坐JR列车）。'},
+    {q:'座位有指定吗？',a:'座位按先到先得原则分配，不提供预先座位预订，但如需特别协助（如轮椅使用者），请提前告知我们。'},
+    {q:'巴士上有厕所吗？',a:'车内没有厕所。但途中会有一次厕所休息站。'},
+    {q:'可以在巴士上吃东西或喝饮料吗？',a:'允许饮用水和茶。请避免其他食物和饮料。只要保持座位整洁，儿童零食可以接受。<strong>禁止携带软冰淇淋上车。</strong>'},
+    {q:'可以携带宠物吗？',a:'不可以——巴士不允许携带宠物。'},
+    {q:'应预留多少衔接时间？',a:'<table class="conn-table"><thead><tr><th>航班类型</th><th>飞机→巴士</th><th>巴士→飞机</th></tr></thead><tbody><tr><td>国内航班</td><td><strong>60分钟</strong></td><td><strong>60分钟</strong></td></tr><tr><td>国际航班</td><td><strong>90分钟</strong></td><td><strong>120分钟</strong></td></tr></tbody></table><br>注：运营商对超出其控制范围的情况造成的延误不承担责任。'},
+  ],
+  footerCaptions:{
+    schedule:{jp:'羊蹄山 · 夏',h3:'北海道<em>呼吸</em>之处'},
+    reserve:{jp:'新千岁机场 · 倶知安村',h3:'您的旅途<em>从这里启程</em>'},
+    explore:{jp:'夏日倶知安 · 体验',h3:'山只是<em>一个开始</em>'},
+    cancel:{jp:'夏日倶知安 · 下次再见',h3:'计划会变。倶知安<em>等待着您。</em>'},
+    faq:{jp:'羊蹄山 · 夏',h3:'北海道<em>呼吸</em>之处'},
+  },
+  footerBrand:'倶知安村', footerTagline:'2027年夏季', footerBack:'返回顶部 ↑',
+  footerMeta:['© 2027 Niseko Village Co., Ltd.','ニセコビレッジ','日本北海道'],
+  toastFix:'请修正高亮显示的字段。',
+  toastStorageFull:'存储空间已满。', toastSaveFail:'无法保存。',
+  lightboxHint:'点击任意位置或按ESC关闭',
+  storageWarn:'⚠ 您的浏览器正在阻止本地存储（隐私模式？）。预约信息无法保存在此设备上。',
+  errMaxGuests:'每次预约最多35名乘客。',
+  errBusRange:(bus)=>`${bus.label}仅在${bus.periodLabel}期间运行，请选择该范围内的日期。`,
+  errWindowFuture:(ws)=>`该日期的预约将于${ws.opensOn}开放，并于${ws.closesOn}截止。`,
+  errWindowPast:(ws)=>`该日期的预约已于${ws.closesOn}截止，请直接联系我们。`,
+  dateHintText:(bus)=>`${bus.label}在${bus.periodLabel}期间运行。可在旅行前一个月至前四天内进行预约。`,
+  dateHintOpen:(ws)=>`<span style="color:var(--moss)">✓ 预约开放中</span> · 截止日期：${ws.closesOn}`,
+  dateHintClosed:(ws)=>`<span style="color:var(--red)">✕ 预约已截止（截止日期：${ws.closesOn}）</span>`,
+  periodLabels:{ p1:'5月15日 – 6月15日', p2:'6月16日 – 8月31日', p3:'9月1日 – 9月30日' },
+  plhGuests:'最多35位',
+};
+
+
+renderSchedule();
+renderExplore();
+renderFaq();
+setupReveal();
+
+/* ════ CANCELLATIONS ════ */
+async function addCancellation(r) {
+  try {
+    const resp = await fetch(`${API_BASE}/api/cancellations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(r),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    return await resp.json();
+  } catch (e) {
+    showToast('Could not submit cancellation request. Please try again.', 'error');
+    return null;
+  }
+}
+
+function validateCancelForm() {
+  document.querySelectorAll('#cancelFormWrap .field.invalid').forEach(f => f.classList.remove('invalid'));
+  let firstBad = null;
+  const val = id => document.getElementById(id).value.trim();
+  const fail = id => {
+    const w = document.querySelector(`#cancelFormWrap .field[data-field="${id}"]`);
+    if (w) w.classList.add('invalid');
+    if (!firstBad) firstBad = id;
+  };
+  if (!val('cf_ref'))   fail('cf_ref');
+  if (!val('cf_first')) fail('cf_first');
+  if (!val('cf_last'))  fail('cf_last');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('cf_email'))) fail('cf_email');
+  if (!val('cf_date'))  fail('cf_date');
+  if (!val('cf_reason')) fail('cf_reason');
+  if (!document.getElementById('cf_confirm').checked) fail('cf_confirm');
+  if (firstBad) {
+    document.getElementById(firstBad).scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(() => document.getElementById(firstBad).focus(), 300);
+    showToast('Please fix the highlighted fields.', 'error');
+    return false;
+  }
+  return true;
+}
+
+async function submitCancellation() {
+  if (!validateCancelForm()) return;
+  const cancelBtn = document.getElementById('cancelSubmitBtn');
+  if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.textContent = 'Sending…'; }
+  const r = {
+    ref:   document.getElementById('cf_ref').value.trim().toUpperCase(),
+    first: document.getElementById('cf_first').value.trim(),
+    last:  document.getElementById('cf_last').value.trim(),
+    email: document.getElementById('cf_email').value.trim(),
+    date:  document.getElementById('cf_date').value,
+    hotel: document.getElementById('cf_hotel').value.trim(),
+    reason: document.getElementById('cf_reason').value.trim(),
+  };
+  const saved = await addCancellation(r);
+  if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Submit Request'; }
+  if (!saved) return;
+  document.getElementById('cancelSuccessRef').innerHTML = `
+    <div class="success-ref-row"><span class="k">Booking Ref.</span><span class="v code">${saved.ref}</span></div>
+    <div class="success-ref-row"><span class="k">Name</span><span class="v">${saved.first} ${saved.last}</span></div>
+    <div class="success-ref-row"><span class="k">Travel Date</span><span class="v">${saved.date}</span></div>
+    <div class="success-ref-row"><span class="k">Status</span><span class="v">Pending review</span></div>`;
+  ['cf_ref','cf_first','cf_last','cf_email','cf_hotel','cf_reason'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('cf_date').value='';
+  document.getElementById('cf_confirm').checked=false;
+  document.getElementById('cancelFormWrap').style.display = 'none';
+  document.getElementById('cancelSuccessScreen').style.display = 'block';
+  keepViewOnSuccess('cancelSuccessScreen');
+}
+
+document.getElementById('cf_confirm').addEventListener('change', () => {
+  const w = document.querySelector('#cancelFormWrap .field[data-field="cf_confirm"]');
+  if (w) w.classList.remove('invalid');
+});
+document.getElementById('cancelSubmitBtn').addEventListener('click', submitCancellation);
+document.getElementById('cancelBackBtn').addEventListener('click', () => {
+  document.getElementById('cancelSuccessScreen').style.display = 'none';
+  document.getElementById('cancelFormWrap').style.display = 'block';
+  switchPanel('schedule');
+});
+['cf_ref','cf_first','cf_last','cf_email','cf_date','cf_hotel','cf_reason'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => {
+    const w = document.querySelector(`#cancelFormWrap .field[data-field="${id}"]`);
+    if (w) w.classList.remove('invalid');
+  });
+});
+
+/* ════ CUSTOM SELECT ENGINE ════ */
+let _fSelectJustOpened = false;
+
+function openFSelect(trigger, dropdown) {
+  closeAllFSelects();
+  const rect = trigger.getBoundingClientRect();
+  dropdown.style.top    = (rect.bottom + 2) + 'px';
+  dropdown.style.left   = rect.left + 'px';
+  dropdown.style.width  = rect.width + 'px';
+  dropdown.style.display = 'block';
+  trigger.classList.add('open');
+  _fSelectJustOpened = true;
+}
+
+function closeAllFSelects() {
+  document.querySelectorAll('.f-select-dropdown').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.f-select-trigger').forEach(t => t.classList.remove('open'));
+}
+
+function initFSelect(hiddenId, triggerId, dropdownId, onChange) {
+  const trigger  = document.getElementById(triggerId);
+  const dropdown = document.getElementById(dropdownId);
+  if (!trigger || !dropdown) return;
+
+  trigger.addEventListener('click', () => {
+    const isOpen = dropdown.style.display === 'block';
+    if (isOpen) { closeAllFSelects(); } else { openFSelect(trigger, dropdown); }
+  });
+
+  attachFSelectListeners(hiddenId, triggerId, dropdownId, onChange);
+}
+
+/* Close on outside click — skip if we just opened one */
+document.addEventListener('click', () => {
+  if (_fSelectJustOpened) { _fSelectJustOpened = false; return; }
+  closeAllFSelects();
+});
+
+/* f_bus custom select is initialized dynamically in updateBusOptions */
+
+</script>
+<!-- LANGUAGE SWITCHER -->
+<div class="lang-switcher" id="langSwitcher">
+  <button class="lang-btn active" data-lang="en">EN</button>
+  <span class="lang-divider"></span>
+  <button class="lang-btn" data-lang="ja">日本語</button>
+  <span class="lang-divider"></span>
+  <button class="lang-btn" data-lang="ko">한국어</button>
+  <span class="lang-divider"></span>
+  <button class="lang-btn" data-lang="zh">中文</button>
+</div>
+<div class="lightbox-overlay" id="lightboxOverlay">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-hint">Click anywhere or press ESC to close</div>
+  </div>
+</div>
+<script>
+(function(){
+  const overlay = document.getElementById('lightboxOverlay');
+  function closeLightbox() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+})();
+</script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   INTERNATIONALISATION  —  EN · JA · KO · ZH
+   Strategy: each language stores all strings. switchLang() replaces
+   innerHTML of static containers and re-renders dynamic sections.
+   EN always restored via page reload (zero regression risk).
+   ══════════════════════════════════════════════════════════════════ */
+
+
+/* ════ OVERRIDE DYNAMIC RENDER FUNCTIONS ════ */
+
+function getPeriodLabel(bus) {
+  const L = t();
+  return (L.periodLabels && bus.periods && L.periodLabels[bus.periods[0]]) || bus.periodLabel;
+}
+
+renderFaq = function() {
+  const L = t();
+  document.getElementById('faqList').innerHTML = L.faqs.map(f => `
+    <div class="faq-item">
+      <button class="faq-q"><span>${f.q}</span><svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="faq-a"><div class="faq-a-inner">${f.a}</div></div>
+    </div>`).join('');
+  document.querySelectorAll('#faqList .lightbox-trigger').forEach(img => {
+    img.addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('lightboxImg').src = img.src;
+      document.getElementById('lightboxImg').alt = img.alt;
+      document.getElementById('lightboxOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+};
+
+renderExplore = function() {
+  const L = t();
+  document.getElementById('exploreGrid').innerHTML = EXPLORE_LINKS.map(e => `
+    <a class="explore-card" href="${e.url}" target="_blank" rel="noopener">
+      <img src="${e.img}" alt="${e.name||''}" loading="lazy" onerror="this.style.background='var(--moss)';this.style.minHeight='200px'">
+      <div class="explore-card-overlay"><span class="explore-arrow">${L.exploreArrow}</span></div>
+    </a>`).join('');
+};
+
+renderPeriods = function() {
+  const L = t();
+  document.getElementById('periodPills').innerHTML =
+    PERIODS.map(p => { const lbl=(L.periodLabels&&L.periodLabels[p.id])||p.label; return `<button class="period-pill ${schedState.period===p.id?'active':''}" data-period="${p.id}">${lbl}</button>`; }).join('');
+};
+
+renderBuses = function() {
+  const L = t();
+  const c = document.getElementById('busCards');
+  const buses = schedState.dir==='arrival' ? BUSES_ARRIVAL : BUSES_DEPARTURE;
+  const stops = schedState.dir==='arrival' ? STOPS_ARRIVAL : STOPS_DEPARTURE;
+  const filtered = buses.filter(b => b.periods.includes(schedState.period));
+  if (!filtered.length) {
+    c.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>${L.noBuses}</p></div>`;
+    return;
+  }
+  c.innerHTML = filtered.map(bus => `
+    <div class="bus-card">
+      <div class="bus-card-img">
+        <img src="${BUS_IMG}" alt="Bus ${bus.id}" onerror="this.parentElement.style.background='var(--moss)';this.style.display='none'">
+      </div>
+      <div class="bus-card-body">
+        <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--cream)">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--ink);font-style:italic">${bus.label}</div>
+          <div style="font-size:13px;letter-spacing:.25em;color:var(--sage);text-transform:uppercase;margin-top:4px">${getPeriodLabel(bus)}</div>
+        </div>
+        <div class="route">
+          ${stops.map((stop,i)=>`
+            <div class="stop">
+              <div class="stop-dot-col"><div class="stop-dot"></div>${i<stops.length-1?'<div class="stop-line"></div>':''}</div>
+              <div class="stop-info"><div class="stop-time">${bus.times[i]}</div><div class="stop-name">${stop.en}</div><div class="stop-name-jp">${_lang==='ko'?(stop.ko||stop.jp):_lang==='zh'?(stop.zh||stop.jp):stop.jp}</div></div>
+            </div>`).join('')}
+        </div>
+        <div class="travel-time"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${L.travelTime(bus.duration)}</span></div>
+        ${(()=>{const today=todayJST(),start=new Date(bus.start+'T00:00:00Z'),end=new Date(bus.end+'T00:00:00Z');
+          if(!TEST_MODE&&today<start)return`<button class="book-btn" disabled style="opacity:.45;cursor:not-allowed;">${L.comingSoon}</button>`;
+          if(!TEST_MODE&&today>end)return`<button class="book-btn" disabled style="opacity:.45;cursor:not-allowed;">${L.periodEnded}</button>`;
+          return`<button class="book-btn" data-busid="${bus.id}" data-dir="${schedState.dir}">${L.bookBtn}</button>`;
+        })()}
+      </div>
+    </div>
+  </div>`).join('');
+};
+
+updateBusOptions = function() {
+  const L = t();
+  const dir = document.getElementById('f_dir').value;
+  const sel = document.getElementById('f_bus');
+  document.getElementById('f_flighttype_wrap').style.display = (dir==='departure') ? '' : 'none';
+  if (dir !== 'departure') document.getElementById('f_flighttype').value = '';
+  if (!dir) { sel.innerHTML = `<option value="">${L.optBusSel}</option>`; updateBusSummary(); return; }
+  const allBuses = dir==='arrival' ? BUSES_ARRIVAL : BUSES_DEPARTURE;
+  const todayS = todayStrJST();
+  const buses = allBuses.filter(b => {
+    if (TEST_MODE) return true;
+    if (b.end < todayS) return false;
+    const st = new Date(b.start+'T00:00:00Z');
+    const wo = new Date(Date.UTC(st.getUTCFullYear(), st.getUTCMonth()-1, st.getUTCDate()));
+    return todayS >= wo.toISOString().slice(0,10);
+  });
+  if (!buses.length) { sel.innerHTML = `<option value="">${L.optBusNone}</option>`; updateBusSummary(); return; }
+  sel.innerHTML = `<option value="">${L.optBusSel}</option>` +
+    buses.map(b=>`<option value="${b.id}">${b.label} — ${b.times[0]} dep. (${getPeriodLabel(b)})</option>`).join('');
+  updateDateHint();
+};
+
+updateDateHint = function() {
+  const L = t();
+  const busId = document.getElementById('f_bus').value;
+  const hint = document.getElementById('dateHint');
+  const dateInput = document.getElementById('f_date');
+  const bus = busById(busId);
+  if (bus) {
+    const todayS = todayStr();
+    const tp4 = (()=>{ const d=new Date(todayS+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+4); return d.toISOString().slice(0,10); })();
+    const minDate = [bus.start, tp4].sort().pop();
+    const tp1m = todayPlusOneMonth();
+    const bEnd = new Date(bus.end+'T00:00:00Z'); bEnd.setUTCDate(bEnd.getUTCDate()-4);
+    const maxDate = [tp1m, bEnd.toISOString().slice(0,10)].sort()[0];
+    dateInput.min = minDate; dateInput.max = maxDate;
+    const chosen = dateInput.value;
+    if (chosen) {
+      const ws = bookingWindowStatus(chosen);
+      hint.innerHTML = ws.open ? L.dateHintOpen(ws) : L.dateHintClosed(ws);
+    } else {
+      hint.textContent = L.dateHintText(bus);
+    }
+  } else {
+    hint.textContent = ''; dateInput.min = todayStr(); dateInput.max = '2026-09-30'; dateInput.value = '';
+  }
+  if (TEST_MODE) { dateInput.removeAttribute('min'); dateInput.removeAttribute('max'); if (bus) hint.innerHTML = '<span style="color:#b3261e">⚑ Test mode — any date allowed</span>'; }
+  updateBusSummary();
+};
+
+updateBusSummary = function() {
+  const L = t();
+  const busId = document.getElementById('f_bus').value;
+  const dir = document.getElementById('f_dir').value;
+  const bar = document.getElementById('busSummaryBar');
+  const bus = busById(busId);
+  if (!bus || !dir) { bar.classList.remove('visible'); document.getElementById('formBusLabel').textContent = L.reserveSubtitle; return; }
+  document.getElementById('busSummary_name').textContent = bus.label;
+  document.getElementById('busSummary_dir').textContent = L.dirLabel(dir);
+  document.getElementById('busSummary_time').textContent = bus.times[0];
+  document.getElementById('busSummary_period').textContent = bus.periodLabel;
+  bar.classList.add('visible');
+};
+
+validateForm = function() {
+  const L = t();
+  clearAllErrors();
+  let firstBad = null;
+  const val = id => document.getElementById(id).value.trim();
+  const fail = id => { setFieldError(id,true); if(!firstBad) firstBad=id; };
+  if(!val('f_first')) fail('f_first');
+  if(!val('f_last'))  fail('f_last');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('f_email'))) fail('f_email');
+  const phone = val('f_phone');
+  if(phone && !/^[\d\s+()\-]{6,}$/.test(phone)) fail('f_phone');
+  if(!val('f_guests')) fail('f_guests');
+  else if(parseInt(val('f_guests'))>35){setFieldError('f_guests',true);document.querySelector('.field[data-field="f_guests"] .field-error').textContent=L.errMaxGuests;if(!firstBad)firstBad='f_guests';}
+  if(!val('f_dir'))   fail('f_dir');
+  if(!val('f_bus'))   fail('f_bus');
+  if(!val('f_hotel')) fail('f_hotel');
+  const date=val('f_date'), bus=busById(val('f_bus'));
+  if(!date){fail('f_date');}
+  else if(!TEST_MODE&&bus&&(date<bus.start||date>bus.end)){
+    setFieldError('f_date',true);
+    document.querySelector('.field[data-field="f_date"] .field-error').textContent=L.errBusRange(bus);
+    if(!firstBad)firstBad='f_date';
+  } else if(date&&!bookingWindowOpen(date)){
+    setFieldError('f_date',true);
+    const ws=bookingWindowStatus(date), today2=todayJST(), travel=new Date(date+'T00:00:00Z');
+    document.querySelector('.field[data-field="f_date"] .field-error').textContent=today2<travel?L.errWindowFuture(ws):L.errWindowPast(ws);
+    if(!firstBad)firstBad='f_date';
+  }
+  if(firstBad){
+    document.getElementById(firstBad).scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(()=>document.getElementById(firstBad).focus(),300);
+    showToast(L.toastFix,'error');
+    return false;
+  }
+  return true;
+};
+
+showSuccess = function(r) {
+  const L = t();
+  const dirLabel = L.dirLabel(r.dir);
+  document.getElementById('successRef').innerHTML = `
+    <div class="success-ref-row"><span class="k">${L.successRef}</span><span class="v code">#${r.id.toUpperCase()}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successName}</span><span class="v">${r.first} ${r.last}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successRoute}</span><span class="v">${r.bus} · ${dirLabel}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successDate}</span><span class="v">${r.date}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successGuests}</span><span class="v">${r.guests}</span></div>
+    ${r.reservationId?`<div class="success-ref-row"><span class="k">${L.successHotelId}</span><span class="v">${r.reservationId}</span></div>`:''}
+    <div class="success-ref-row"><span class="k">Status</span><span class="v">${L.successStatus}</span></div>`;
+  document.getElementById('reserveFormWrap').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+  keepViewOnSuccess('successScreen');
+};
+
+resetForm = (function(_orig){
+  return function(){
+    _orig();
+    const L = t();
+    document.getElementById('f_bus').innerHTML = `<option value="">${L.optBusSel}</option>`;
+    document.getElementById('formBusLabel').textContent = L.reserveSubtitle;
+  };
+})(resetForm);
+
+/* Patch submitCancellation success ref */
+const _origSubmitCancellation = submitCancellation;
+submitCancellation = function() {
+  const L = t();
+  /* call original but intercept cancelSuccessRef rendering */
+  const origSaveFn = saveCancellations;
+  saveCancellations = function(list) {
+    const result = origSaveFn(list);
+    if (result && list.length > 0) {
+      const r = list[0];
+      document.getElementById('cancelSuccessRef').innerHTML = L.cancelSuccessRef(r);
+    }
+    saveCancellations = origSaveFn;
+    return result;
+  };
+  _origSubmitCancellation();
+};
+
+/* Patch switchPanel for localised footer captions */
+const _origSwitchPanel = switchPanel;
+switchPanel = function(id) {
+  _origSwitchPanel(id);
+  const L = t();
+  const cap = L.footerCaptions[id] || L.footerCaptions.schedule;
+  const jpEl = document.getElementById('footerHeroJp');
+  const titleEl = document.getElementById('footerHeroTitle');
+  if (jpEl) jpEl.textContent = cap.jp;
+  if (titleEl) titleEl.innerHTML = cap.h3;
+};
+
+/* ════ MAIN SWITCH FUNCTION ════ */
+function switchLang(lang) {
+  if (!LOCALE[lang] || lang === 'en') return;
+  _lang = lang;
+  const L = LOCALE[lang];
+  document.documentElement.lang = L.htmlLang;
+
+  /* hero */
+  document.querySelector('.hero-eyebrow').innerHTML = L.heroEyebrow;
+  document.querySelector('.hero-title').innerHTML   = L.heroTitle;
+  document.querySelector('.hero-sub').innerHTML     = L.heroSub;
+  const badges = document.querySelectorAll('.hero-badge, .hero-badge-outline');
+  badges[0]&&(badges[0].textContent=L.heroBadge1);
+  badges[1]&&(badges[1].textContent=L.heroBadge2);
+  badges[2]&&(badges[2].textContent=L.heroBadge3);
+
+  /* notice */
+  document.querySelector('.notice > div').innerHTML = L.noticeHTML;
+
+  /* storage warn */
+  document.getElementById('storageWarn').textContent = L.storageWarn;
+
+  /* nav */
+  const navKeys=['navSchedule','navReserve','navExplore','navCancel','navFaq'];
+  document.querySelectorAll('.nav-tab').forEach((tab,i)=>{ if(navKeys[i]) tab.textContent=L[navKeys[i]]; });
+
+  /* schedule head */
+  const sp=document.getElementById('panel-schedule');
+  sp.querySelector('.kicker').innerHTML=L.schedKicker;
+  sp.querySelector('h2').innerHTML=L.schedH2;
+  sp.querySelector('.panel-head p').innerHTML=L.schedP;
+  sp.querySelector('.pdf-link').textContent=L.schedPdf;
+  const dts=document.querySelectorAll('.dir-tab');
+  dts[0]&&(dts[0].innerHTML=L.dirArrival);
+  dts[1]&&(dts[1].innerHTML=L.dirDeparture);
+  document.querySelector('.period-label').textContent=L.periodLabel;
+
+  /* reserve form */
+  const rfw=document.getElementById('reserveFormWrap');
+  rfw.querySelector('.form-eyebrow').innerHTML=L.reserveEyebrow;
+  rfw.querySelector('.form-title').innerHTML=L.reserveTitle;
+  document.getElementById('formBusLabel').textContent=L.reserveSubtitle;
+
+  /* notice in reserve */
+  const nh=document.querySelector('.reserve-notice-head');
+  if(nh){const svg=nh.querySelector('svg');nh.innerHTML='';if(svg)nh.appendChild(svg);nh.insertAdjacentText('beforeend',' '+L.noticeHead);}
+  const np=document.querySelector('.reserve-notice > p');
+  if(np) np.innerHTML=L.noticeBodyHTML;
+  const nsub=document.querySelector('.reserve-notice-sub');
+  if(nsub) nsub.textContent=L.connectingTime;
+
+  /* conn table */
+  const ths=document.querySelectorAll('.reserve-notice .conn-table th');
+  ths[0]&&(ths[0].textContent=L.colFlight);
+  ths[1]&&(ths[1].textContent=L.colFromPlane);
+  ths[2]&&(ths[2].textContent=L.colFromBus);
+  const ctds=document.querySelectorAll('.reserve-notice .conn-table td');
+  ctds[0]&&(ctds[0].textContent=L.rowDomestic);
+  ctds[3]&&(ctds[3].textContent=L.rowIntl);
+
+  /* form section labels */
+  const sls=rfw.querySelectorAll('.form-section-label');
+  sls[0]&&(sls[0].textContent=L.secGuest);
+  sls[1]&&(sls[1].textContent=L.secJourney);
+
+  /* helper */
+  const setLbl=(fid,txt,ctx=document)=>{const el=ctx.querySelector(`.field[data-field="${fid}"] label:not(.checkbox-custom)`);if(el)el.textContent=txt;};
+
+  /* reserve labels */
+  setLbl('f_reservationId',L.lblResId,rfw); setLbl('f_first',L.lblFirst,rfw);
+  setLbl('f_last',L.lblLast,rfw);           setLbl('f_email',L.lblEmail,rfw);
+  setLbl('f_phone',L.lblPhone,rfw);         setLbl('f_guests',L.lblGuests,rfw);
+  setLbl('f_golfBags',L.lblGolf,rfw);       setLbl('f_luggage',L.lblLuggage,rfw);
+  /* f_dir label */
+  const fDirLbl=rfw.querySelector('.field[data-field="f_dir"] label');
+  if(fDirLbl)fDirLbl.textContent=L.lblDirection;
+  setLbl('f_bus',L.lblBus,rfw);             setLbl('f_date',L.lblDate,rfw);
+  setLbl('f_hotel',L.lblHotel,rfw);         setLbl('f_flight',L.lblFlight,rfw);
+  setLbl('f_flighttype',L.lblFlightType,rfw); setLbl('f_notes',L.lblNotes,rfw);
+
+  /* direction options */
+  const fd=document.getElementById('f_dir');
+  if(fd){fd.options[0]&&(fd.options[0].text=L.optDirSel);fd.options[1]&&(fd.options[1].text=L.optDirArr);fd.options[2]&&(fd.options[2].text=L.optDirDep);}
+  const fh=document.getElementById('f_hotel');
+  if(fh&&fh.options[0])fh.options[0].text=L.optHotelSel;
+  const ff=document.getElementById('f_flighttype');
+  if(ff){ff.options[0]&&(ff.options[0].text=L.optFtSel);ff.options[1]&&(ff.options[1].text=L.optFtDom);ff.options[2]&&(ff.options[2].text=L.optFtIntl);}
+  const fn=document.getElementById('f_notes');
+  if(fn)fn.placeholder=L.notesPlh;
+  const fg=document.getElementById('f_guests'); if(fg&&L.plhGuests)fg.placeholder=L.plhGuests;
+  const fbus=document.getElementById('f_bus'); if(fbus&&fbus.options[0]&&!fbus.options[0].value)fbus.options[0].text=L.optBusSel;
+  document.getElementById('submitBtn').textContent=L.submitBtn;
+
+  /* summary labels */
+  const sums=document.querySelectorAll('.bus-summary-lbl');
+  const sk=['sumBus','sumDir','sumDep','sumPeriod'];
+  sums.forEach((el,i)=>{if(L[sk[i]])el.textContent=L[sk[i]];});
+
+  /* success screen */
+  const ss=document.getElementById('successScreen');
+  ss.querySelector('.success-title').innerHTML=L.successTitle;
+  ss.querySelector('.success-sub').textContent=L.successSub;
+  document.getElementById('newBookingBtn').textContent=L.newBookingBtn;
+  document.getElementById('backToScheduleBtn').textContent=L.backSchedBtn;
+
+  /* explore head */
+  const ep=document.getElementById('panel-explore');
+  ep.querySelector('.kicker').innerHTML=L.exploreKicker;
+  ep.querySelector('h2').innerHTML=L.exploreH2;
+  ep.querySelector('.panel-head p').innerHTML=L.exploreP;
+
+  /* cancel panel */
+  const cp=document.getElementById('panel-cancel');
+  cp.querySelector('.kicker').innerHTML=L.cancelKicker;
+  cp.querySelector('.panel-head h2').innerHTML=L.cancelH2;
+  cp.querySelector('.panel-head p').textContent=L.cancelP;
+  const cfw=document.getElementById('cancelFormWrap');
+  cfw.querySelector('.form-eyebrow').innerHTML=L.cancelEyebrow;
+  cfw.querySelector('.form-title').innerHTML=L.cancelTitle;
+  cfw.querySelector('.form-subtitle').textContent=L.cancelSubtitle;
+  const csls=cfw.querySelectorAll('.form-section-label');
+  csls[0]&&(csls[0].textContent=L.secBooking);
+  setLbl('cf_ref',L.lblRef,cfw);   setLbl('cf_first',L.lblCFirst,cfw);
+  setLbl('cf_last',L.lblCLast,cfw); setLbl('cf_email',L.lblCEmail,cfw);
+  setLbl('cf_date',L.lblCDate,cfw); setLbl('cf_hotel',L.lblCHotel,cfw);
+  setLbl('cf_reason',L.lblReason,cfw);
+  const cfr=document.getElementById('cf_reason'); if(cfr)cfr.placeholder=L.reasonPlh;
+  const cfh=document.getElementById('cf_hotel'); if(cfh&&cfh.options[0])cfh.options[0].text=L.optHotelSel;
+  const chk=document.querySelector('.checkbox-label > span'); if(chk)chk.textContent=L.confirmChk;
+  document.getElementById('cancelSubmitBtn').textContent=L.cancelSubmit;
+  const css=document.getElementById('cancelSuccessScreen');
+  css.querySelector('.success-title').innerHTML=L.cancelSuccessTitle;
+  css.querySelector('.success-sub').textContent=L.cancelSuccessSub;
+  document.getElementById('cancelBackBtn').textContent=L.cancelBack;
+
+  /* FAQ */
+  document.querySelector('.section-title').innerHTML=L.faqSectionTitle;
+  const faqCap=document.querySelector('.faq-img-caption');
+  if(faqCap){
+    const strong=faqCap.querySelector('strong');
+    if(strong)strong.textContent=L.faqCaptionTitle;
+    const body=faqCap.querySelector('.faq-cap-body');
+    if(body)body.textContent=L.faqCaptionBody;
+  }
+  document.querySelector('.terms-title').innerHTML=L.termsTitle;
+  document.querySelectorAll('.terms-list li').forEach((li,i)=>{
+    if(L.terms[i]===undefined)return;
+    const dot=li.querySelector('.terms-dot'); li.innerHTML='';
+    if(dot)li.appendChild(dot);
+    const span=document.createElement('span'); span.innerHTML=L.terms[i]; li.appendChild(span);
+  });
+
+  /* modal */
+  document.getElementById('modalGo').textContent=L.modalGo;
+
+  /* footer */
+  const fbt=document.querySelector('.footer-back-top');
+  if(fbt)fbt.textContent=L.footerBack;
+  const fmeta=document.querySelector('.footer-meta span');
+  if(fmeta)fmeta.textContent=L.footerMeta[0];
+  const fseason=document.querySelector('.footer-season');
+  if(fseason)fseason.textContent=L.footerTagline;
+  const lbh=document.querySelector('.lightbox-hint'); if(lbh)lbh.textContent=L.lightboxHint;
+
+  /* footer captions for active panel */
+  const activePanel=document.querySelector('.nav-tab.active')?.dataset?.panel||'schedule';
+  const cap=L.footerCaptions[activePanel]||L.footerCaptions.schedule;
+  const jpEl=document.getElementById('footerHeroJp');
+  const titleEl=document.getElementById('footerHeroTitle');
+  if(jpEl)jpEl.textContent=cap.jp;
+  if(titleEl)titleEl.innerHTML=cap.h3;
+
+  /* re-render dynamic sections */
+  renderFaq(); renderExplore(); renderSchedule();
+
+  try{localStorage.setItem('nvbus_lang',lang);}catch(e){}
+}
+
+/* ════ LANG BUTTON WIRING ════ */
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if (lang === 'en') {
+      try{localStorage.setItem('nvbus_lang','en');}catch(e){}
+      try{
+        const panel=document.querySelector('.nav-tab.active')?.dataset?.panel||'schedule';
+        sessionStorage.setItem('nvbus_restore',JSON.stringify({panel,y:window.scrollY}));
+      }catch(e){}
+      location.reload();
+    } else {
+      switchLang(lang);
+    }
+  });
+});
+
+/* f_dir / f_bus subtitle sync */
+document.getElementById('f_dir').addEventListener('change',()=>document.getElementById('formBusLabel').textContent=t().reserveSubtitle,true);
+document.getElementById('f_bus').addEventListener('change',()=>document.getElementById('formBusLabel').textContent=t().reserveSubtitle,true);
+
+/* Restore saved language on load */
+(function(){
+  try{
+    const saved=localStorage.getItem('nvbus_lang');
+    if(saved&&LOCALE[saved]&&saved!=='en'){
+      const btn=document.querySelector(`.lang-btn[data-lang="${saved}"]`);
+      if(btn){
+        document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        switchLang(saved);
+      }
+    }
+  }catch(e){}
+})();
+
+/* Restore active panel + scroll after switching back to English (reload) */
+(function(){
+  try{
+    const raw=sessionStorage.getItem('nvbus_restore');
+    if(!raw)return;
+    sessionStorage.removeItem('nvbus_restore');
+    const {panel,y}=JSON.parse(raw);
+    if('scrollRestoration' in history)history.scrollRestoration='manual';
+    if(panel&&panel!=='schedule'&&document.getElementById(`panel-${panel}`))switchPanel(panel);
+    requestAnimationFrame(()=>window.scrollTo({top:y||0,behavior:'instant'}));
+  }catch(e){}
+})();
+
+/* ════ Clear pre-filled bus selection ════ */
+LOCALE.en.clearSel = 'Clear selection';
+if (LOCALE.ja) LOCALE.ja.clearSel = '選択をクリア';
+if (LOCALE.ko) LOCALE.ko.clearSel = '선택 해제';
+if (LOCALE.zh) LOCALE.zh.clearSel = '清除选择';
+function syncClearSelBtn(){
+  const b = document.getElementById('busSummaryClear');
+  if (!b) return;
+  const txt = t().clearSel || LOCALE.en.clearSel;
+  b.setAttribute('aria-label', txt);
+  b.title = txt;
+}
+document.getElementById('busSummaryClear').addEventListener('click', () => {
+  pendingBus = null;
+  document.getElementById('f_dir').value = '';
+  updateBusOptions();          /* resetea f_bus y flight type, oculta la barra */
+  updateDateHint();            /* sin bus: limpia fecha, hint y min/max */
+  ['f_dir','f_bus','f_date'].forEach(id => setFieldError(id, false));
+  document.getElementById('formBusLabel').textContent = t().reserveSubtitle;
+  document.getElementById('f_dir').focus({ preventScroll: true });
+});
+const _origSwitchLangClear = switchLang;
+switchLang = function(lang){ _origSwitchLangClear(lang); syncClearSelBtn(); };
+syncClearSelBtn();
+</script>
+</body>
+</html>
