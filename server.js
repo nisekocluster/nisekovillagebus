@@ -26,6 +26,7 @@ const USERS = {
 };
 
 // ── Middleware ─────────────────────────────────────────────────────────────
+app.set('trust proxy', 1);   // Railway proxy → real client IP for rate limiting
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -311,6 +312,99 @@ app.delete('/api/trash', requireAuth, requireMaster, async (req, res) => {
       pool.query(`DELETE FROM cancellations WHERE trashed_at IS NOT NULL`),
     ]);
     res.json({ ok: true });
+  } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANALYTICS (simple — no cookies, no IPs stored)
+// ══════════════════════════════════════════════════════════════════════════
+pool.query(`
+  CREATE TABLE IF NOT EXISTS analytics_events (
+    id         SERIAL PRIMARY KEY,
+    event      TEXT NOT NULL,
+    lang       TEXT,
+    device     TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+  CREATE INDEX IF NOT EXISTS analytics_events_created_idx ON analytics_events (created_at);
+`).catch(e => console.error('analytics table:', e.message));
+
+const TRACK_EVENTS  = new Set(['visit', 'book_click', 'form_start']);
+const TRACK_LANGS   = new Set(['en', 'ja', 'ko', 'zh']);
+const TRACK_DEVICES = new Set(['mobile', 'tablet', 'desktop']);
+const _trackHits    = new Map();               // simple per-IP rate limit (in memory only)
+setInterval(() => _trackHits.clear(), 60 * 1000).unref();
+
+// POST /api/track  (guest app — no auth required)
+app.post('/api/track', async (req, res) => {
+  const ip = req.ip || 'unknown';
+  const hits = (_trackHits.get(ip) || 0) + 1;
+  _trackHits.set(ip, hits);
+  if (hits > 30) return res.status(429).end();
+  const { event, lang, device } = req.body || {};
+  if (!TRACK_EVENTS.has(event)) return res.status(400).end();
+  try {
+    await pool.query(
+      `INSERT INTO analytics_events (event, lang, device) VALUES ($1, $2, $3)`,
+      [event, TRACK_LANGS.has(lang) ? lang : null, TRACK_DEVICES.has(device) ? device : null]
+    );
+    res.status(204).end();
+  } catch (e) { console.error(e.message); res.status(500).end(); }
+});
+
+// GET /api/analytics?days=30  (master only)
+app.get('/api/analytics', requireAuth, requireMaster, async (req, res) => {
+  try {
+    const days  = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
+    const jst   = new Date(Date.now() + 9 * 3600 * 1000);
+    const to    = jst.toISOString().slice(0, 10);
+    const fromD = new Date(Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate() - (days - 1)));
+    const from  = fromD.toISOString().slice(0, 10);
+
+    const day      = col => `(${col}::timestamptz AT TIME ZONE 'Asia/Tokyo')::date`;
+    const pax      = `COALESCE(SUM(CASE WHEN guests::text ~ '^[0-9]+$' THEN guests::text::int ELSE 0 END), 0)::int`;
+    const evWhere  = `${day('created_at')} >= $1::date`;
+    const resWhere = `trashed_at IS NULL AND ${day('created_at')} >= $1::date`;
+    const q = sql => pool.query(sql, [from]).then(r => r.rows);
+
+    const [visitsDaily, bookingsDaily, events, langs, devices, hotels, buses, sources, cancelReq, cancelled] = await Promise.all([
+      q(`SELECT to_char(${day('created_at')}, 'YYYY-MM-DD') AS day, COUNT(*)::int AS n FROM analytics_events WHERE event = 'visit' AND ${evWhere} GROUP BY 1`),
+      q(`SELECT to_char(${day('created_at')}, 'YYYY-MM-DD') AS day, COUNT(*)::int AS n FROM reservations WHERE ${resWhere} GROUP BY 1`),
+      q(`SELECT event AS key, COUNT(*)::int AS n FROM analytics_events WHERE ${evWhere} GROUP BY 1`),
+      q(`SELECT COALESCE(lang, 'unknown') AS key, COUNT(*)::int AS n FROM analytics_events WHERE event = 'visit' AND ${evWhere} GROUP BY 1 ORDER BY 2 DESC`),
+      q(`SELECT COALESCE(device, 'unknown') AS key, COUNT(*)::int AS n FROM analytics_events WHERE event = 'visit' AND ${evWhere} GROUP BY 1 ORDER BY 2 DESC`),
+      q(`SELECT COALESCE(hotel, 'Unknown') AS key, COUNT(*)::int AS n, ${pax} AS pax FROM reservations WHERE ${resWhere} GROUP BY 1 ORDER BY 2 DESC`),
+      q(`SELECT COALESCE(bus, 'Unknown') AS key, COUNT(*)::int AS n, ${pax} AS pax FROM reservations WHERE ${resWhere} GROUP BY 1 ORDER BY 2 DESC`),
+      q(`SELECT COALESCE(source, 'guest') AS key, COUNT(*)::int AS n FROM reservations WHERE ${resWhere} GROUP BY 1`),
+      q(`SELECT COUNT(*)::int AS n FROM cancellations WHERE ${resWhere}`),
+      q(`SELECT COUNT(*)::int AS n FROM reservations WHERE ${resWhere} AND status = 'cancelled'`),
+    ]);
+
+    const ev   = Object.fromEntries(events.map(r => [r.key, r.n]));
+    const src  = Object.fromEntries(sources.map(r => [r.key, r.n]));
+    const vMap = Object.fromEntries(visitsDaily.map(r => [r.day, r.n]));
+    const bMap = Object.fromEntries(bookingsDaily.map(r => [r.day, r.n]));
+    const daily = [];
+    for (let i = 0; i < days; i++) {
+      const d = new Date(fromD.getTime() + i * 86400000).toISOString().slice(0, 10);
+      daily.push({ day: d, visits: vMap[d] || 0, bookings: bMap[d] || 0 });
+    }
+
+    res.json({
+      days, from, to, daily,
+      totals: {
+        visits:         ev.visit || 0,
+        bookClicks:     ev.book_click || 0,
+        formStarts:     ev.form_start || 0,
+        bookings:       bookingsDaily.reduce((a, r) => a + r.n, 0),
+        guestBookings:  src.guest || 0,
+        staffBookings:  src.admin || 0,
+        pax:            hotels.reduce((a, r) => a + r.pax, 0),
+        cancelRequests: cancelReq[0].n,
+        cancelled:      cancelled[0].n,
+      },
+      langs, devices, hotels, buses,
+    });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
 
