@@ -962,7 +962,7 @@ button,input,select,textarea{font:inherit}
         <div class="section-title">Account Credentials</div>
         <div class="settings-card">
           <div class="settings-title">Change Master Username &amp; Password</div>
-          <p style="font-size:12px;color:var(--sage);margin-bottom:16px;line-height:1.7;letter-spacing:.04em;">This updates the <strong>niseko</strong> master account credentials stored in localStorage. Hotel accounts (ritz, moxy) are managed in the source code.</p>
+          <p style="font-size:12px;color:var(--sage);margin-bottom:16px;line-height:1.7;letter-spacing:.04em;">Passwords are managed in Railway → Variables: <strong>PASS_SUPERADMIN</strong>, <strong>PASS_STAFF</strong>, <strong>PASS_MOXY</strong>, <strong>PASS_RITZ</strong>. Redeploy after changing them.</p>
           <div class="edit-grid">
             <div class="field"><label>New Username</label><input type="text" id="newUser" placeholder="admin" autocomplete="off"></div>
             <div class="field"><label>New Password</label><input type="password" id="newPass" placeholder="min 6 chars" autocomplete="new-password"></div>
@@ -1285,7 +1285,7 @@ async function tryLogin() {
     const _now = new Date(Date.now() + 9*60*60*1000);
     const _todayForFilter = `${_now.getUTCFullYear()}-${String(_now.getUTCMonth()+1).padStart(2,'0')}-${String(_now.getUTCDate()).padStart(2,'0')}`;
     populateBusMultiselect(_todayForFilter);
-    renderDashboard();
+    switchPanel('dashboard');
     updateTopbarMeta();
     updateCancelBadge();
     updateTrashBadge();
@@ -1301,7 +1301,7 @@ async function tryLogin() {
 
 /* Apply UI restrictions based on role */
 function applyRoleUI() {
-  const isMaster = currentUser && currentUser.role === 'master';
+  const isMaster = !(currentUser && currentUser.hotelFilter); /* superadmin + staff see every hotel */
 
   /* Hotel filter: lock to own hotel for hotel roles */
   const hotelWrap = document.getElementById('filterHotelWrap');
@@ -1326,13 +1326,18 @@ function applyRoleUI() {
     syncHotelCheckedState();
   }
 
-  /* Hide Trash and Settings panels from hotel roles */
-  document.querySelectorAll('.nav-item[data-panel="trash"], .nav-item[data-panel="settings"], .nav-item[data-panel="analytics"]').forEach(el => {
-    el.style.display = isMaster ? '' : 'none';
+  /* Analytics + Settings: superadmin only · Trash: every role (server scopes it by hotel) */
+  const isSuper = currentUser && currentUser.role === 'superadmin';
+  document.querySelectorAll('.nav-item[data-panel="analytics"], .nav-item[data-panel="settings"]').forEach(el => {
+    el.style.display = isSuper ? '' : 'none';
   });
+  document.querySelectorAll('.nav-item[data-panel="trash"]').forEach(el => { el.style.display = ''; });
 }
 
 function logout() {
+  stopPolling();
+  _token = null;
+  _res = []; _cancel = []; _trash = [];
   currentUser = null;
   document.getElementById('adminShell').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1674,6 +1679,7 @@ function openEditModal(id, fromDetail = false) {
   fillBusSelect(document.getElementById('e_bus'), r.dir||'arrival', r.bus);
   document.getElementById('e_date').value = r.date||'';
   document.getElementById('e_hotel').value = r.hotel||'Hilton Niseko Village';
+  document.getElementById('e_hotel').disabled = !!(currentUser && currentUser.hotelFilter);
   document.getElementById('e_flight').value = r.flight||'';
   document.getElementById('e_flighttype').value = r.flightType||'';
   document.getElementById('e_status').value = r.status||'pending';
@@ -2004,7 +2010,7 @@ function closeCancelDetail() {
 
 document.getElementById('cancelDetailMarkBtn').addEventListener('click', () => {
   if (!viewingCancelId) return;
-  const r = loadCancel().find(x => x.createdAt === viewingCancelId);
+  const r = loadCancel().find(x => x.id === viewingCancelId);
   closeCancelDetail();
   if (r) setTimeout(() => openCancelStatusAction(r), 50);
 });
@@ -2156,15 +2162,14 @@ function renderHistoryPanel(query) {
       const tsHtml = `<div class="history-entry-ts">${tsLabel[src]}: ${fmtTs(tsRaw)}</div>`;
 
       /* Action buttons */
-      const isMaster = currentUser && currentUser.role === 'master';
       let actionBtn = '';
       if (src === 'reservation') {
         actionBtn = `<button class="history-action-btn" onclick="openResDetail('${r.id}')">View details</button>
                      <button class="history-action-btn ghost" onclick="switchPanel('reservations');setTimeout(()=>{document.getElementById('searchInput').value='${(r.email||'').replace(/'/g,"\'")}';syncClear('searchInput','searchClear');renderResTable();},80)">Go to record</button>`;
       } else if (src === 'cancellation') {
-        actionBtn = `<button class="history-action-btn" onclick="openCancelDetail('${r.createdAt}')">View details</button>
+        actionBtn = `<button class="history-action-btn" onclick="openCancelDetail('${r.id}')">View details</button>
                      <button class="history-action-btn ghost" onclick="switchPanel('cancellations');setTimeout(()=>{document.getElementById('cancelSearchInput').value='${(r.email||r.ref||'').replace(/'/g,"\'")}';syncClear('cancelSearchInput','cancelSearchClear');renderCancelTable();},80)">Go to record</button>`;
-      } else if (src === 'deleted' && isMaster) {
+      } else if (src === 'deleted') {
         actionBtn = `<button class="history-action-btn ghost" onclick="switchPanel('trash');setTimeout(()=>{document.getElementById('trashSearchInput').value='${(r.email||'').replace(/'/g,"\'")}';syncClear('trashSearchInput','trashSearchClear');renderTrashTable();},80)">Go to trash</button>`;
       }
 
@@ -2960,7 +2965,7 @@ function renderTrashTable() {
     <tbody>${list.map(r => {
       const b = busById(r.bus);
       const isCancel = r._trashType === 'cancellation';
-      const trashKey = isCancel ? (r.createdAt||r.id) : r.id;
+      const trashKey = r.id;
       const typeBadge = isCancel
         ? `<span style="font-size:10px;background:rgba(220,53,69,.12);color:var(--red);padding:2px 8px;border-radius:3px;letter-spacing:.06em;text-transform:uppercase">Cancel req</span>`
         : `<span style="font-size:10px;background:rgba(26,63,168,.10);color:var(--moss);padding:2px 8px;border-radius:3px;letter-spacing:.06em;text-transform:uppercase">Reservation</span>`;
