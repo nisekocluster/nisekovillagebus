@@ -1714,8 +1714,8 @@ function showSuccess(r) {
   document.getElementById('successRef').innerHTML = `
     <div class="success-ref-row"><span class="k">Reference</span><span class="v code">#${r.id.toUpperCase()}</span></div>
     <div class="success-ref-row"><span class="k">Name</span><span class="v">${r.first} ${r.last}</span></div>
-    <div class="success-ref-row"><span class="k">Route</span><span class="v">${r.bus} · ${dirLabel}</span></div>
-    <div class="success-ref-row"><span class="k">Date</span><span class="v">${r.date}</span></div>
+    <div class="success-ref-row"><span class="k">Route</span><span class="v">${String(r.bus).replace(/[a-z]$/,'')} · ${dirLabel}</span></div>
+    <div class="success-ref-row"><span class="k">Date</span><span class="v">${String(r.date).slice(0,10)}</span></div>
     <div class="success-ref-row"><span class="k">Guests</span><span class="v">${r.guests}</span></div>
     ${r.reservationId ? `<div class="success-ref-row"><span class="k">Hotel Reservation ID</span><span class="v">${r.reservationId}</span></div>` : ''}
     <div class="success-ref-row"><span class="k">Status</span><span class="v">Pending confirmation</span></div>`;
@@ -2615,8 +2615,8 @@ showSuccess = function(r) {
   document.getElementById('successRef').innerHTML = `
     <div class="success-ref-row"><span class="k">${L.successRef}</span><span class="v code">#${r.id.toUpperCase()}</span></div>
     <div class="success-ref-row"><span class="k">${L.successName}</span><span class="v">${r.first} ${r.last}</span></div>
-    <div class="success-ref-row"><span class="k">${L.successRoute}</span><span class="v">${r.bus} · ${dirLabel}</span></div>
-    <div class="success-ref-row"><span class="k">${L.successDate}</span><span class="v">${r.date}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successRoute}</span><span class="v">${String(r.bus).replace(/[a-z]$/,'')} · ${dirLabel}</span></div>
+    <div class="success-ref-row"><span class="k">${L.successDate}</span><span class="v">${String(r.date).slice(0,10)}</span></div>
     <div class="success-ref-row"><span class="k">${L.successGuests}</span><span class="v">${r.guests}</span></div>
     ${r.reservationId?`<div class="success-ref-row"><span class="k">${L.successHotelId}</span><span class="v">${r.reservationId}</span></div>`:''}
     <div class="success-ref-row"><span class="k">Status</span><span class="v">${L.successStatus}</span></div>`;
