@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS reservations (
   updated_at          TIMESTAMPTZ
 );
 
+-- Staff bookings (staff.html): employer property, e.g. 'Moxy Staff'. NULL for guests.
+ALTER TABLE reservations ADD COLUMN IF NOT EXISTS property TEXT;
+
 CREATE INDEX IF NOT EXISTS idx_res_date    ON reservations (date);
 CREATE INDEX IF NOT EXISTS idx_res_status  ON reservations (status);
 CREATE INDEX IF NOT EXISTS idx_res_hotel   ON reservations (hotel);

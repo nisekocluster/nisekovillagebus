@@ -119,8 +119,8 @@ app.post('/api/reservations', async (req, res) => {
       `INSERT INTO reservations
         (reservation_id, first, last, email, phone, guests, luggage, golf_bags,
          dir, bus, date, hotel, flight, flight_type, notes, status, source,
-         created_by, created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'pending',$16,$17, NOW())
+         created_by, property, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'pending',$16,$17,$18, NOW())
        RETURNING *`,
       [
         r.reservationId || null,
@@ -135,6 +135,7 @@ app.post('/api/reservations', async (req, res) => {
         r.notes || null,
         r.source || 'guest',
         r.createdBy || null,
+        r.property || null,
       ]
     );
     res.status(201).json(dbToRes(rows[0]));
@@ -151,7 +152,7 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
 
     const allowed = [
       'reservation_id','first','last','email','phone','guests','luggage','golf_bags',
-      'dir','bus','date','hotel','flight','flight_type','notes','status',
+      'dir','bus','date','hotel','flight','flight_type','notes','status','property',
       'cancelled_by','cancelled_at','cancellation_reason','previous_status',
       'reactivated_at','reactivated_by',
     ];
@@ -475,6 +476,7 @@ function dbToRes(r) {
     status:             r.status,
     source:             r.source,
     createdBy:          r.created_by,
+    property:           r.property,
     cancelledBy:        r.cancelled_by,
     cancelledAt:        r.cancelled_at,
     cancellationReason: r.cancellation_reason,
@@ -516,6 +518,7 @@ app.get('/api/health', async (_req, res) => {
 
 // ── Clean URLs ────────────────────────────────────────────────────────────
 app.get('/',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'nisekovillagebus.html')));
+app.get('/staff', (req, res) => res.sendFile(path.join(__dirname, 'public', 'staff.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'nvbusadmin.html'), err => {
   if (err) { console.error('admin sendFile:', err.message); res.status(err.status || 500).end(); }
 }));
