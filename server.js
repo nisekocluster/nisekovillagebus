@@ -23,11 +23,12 @@ for (const v of ['PASS_SUPERADMIN', 'PASS_STAFF', 'PASS_MOXY', 'PASS_RITZ']) {
 //   superadmin → everything (incl. Analytics + Settings)
 //   staff      → everything except Analytics + Settings
 //   hotel      → only its own hotel (reservations, cancellations, history, trash)
+//                and only the staff bookings of its own property (staffProperty)
 const USERS = {
-  superadmin: { pass: process.env.PASS_SUPERADMIN, role: 'superadmin', label: 'Super Admin',      hotelFilter: null },
-  nvstaff:    { pass: process.env.PASS_STAFF,      role: 'staff',      label: 'NV Staff',         hotelFilter: null },
-  nvmoxy:     { pass: process.env.PASS_MOXY,       role: 'hotel',      label: 'Moxy',             hotelFilter: 'Moxy' },
-  nvritz:     { pass: process.env.PASS_RITZ,       role: 'hotel',      label: 'The Ritz-Carlton', hotelFilter: 'Ritz-Carlton Reserve' },
+  superadmin: { pass: process.env.PASS_SUPERADMIN, role: 'superadmin', label: 'Super Admin',      hotelFilter: null,                   staffProperty: null },
+  nvstaff:    { pass: process.env.PASS_STAFF,      role: 'staff',      label: 'NV Staff',         hotelFilter: null,                   staffProperty: null },
+  nvmoxy:     { pass: process.env.PASS_MOXY,       role: 'hotel',      label: 'Moxy',             hotelFilter: 'Moxy',                 staffProperty: 'Moxy Staff' },
+  nvritz:     { pass: process.env.PASS_RITZ,       role: 'hotel',      label: 'The Ritz-Carlton', hotelFilter: 'Ritz-Carlton Reserve', staffProperty: 'Ritz Carlton Staff' },
 };
 
 // ── Middleware ─────────────────────────────────────────────────────────────
@@ -66,13 +67,24 @@ function hotelScope(req, params) {
   return ` AND hotel = $${params.length}`;
 }
 
+// Reservations scope for hotel roles: guest bookings of its hotel + staff bookings of its property.
+// Staff bookings are matched by property only (the pickup hotel may be another one).
+function resScope(req, params) {
+  const h = hotelFilter(req);
+  if (!h) return '';
+  params.push(h);
+  const hi = params.length;
+  params.push(req.user.staffProperty || '');
+  return ` AND ((property IS NULL AND hotel = $${hi}) OR property = $${params.length})`;
+}
+
 // ── POST /api/auth ─────────────────────────────────────────────────────────
 // Token lifetime is slightly longer than the 30-min inactivity limit enforced in the admin;
 // while the user is active the admin renews it through /api/auth/refresh.
 const TOKEN_TTL = '35m';
 function signUser(username, u) {
   return jwt.sign(
-    { username, role: u.role, label: u.label, hotelFilter: u.hotelFilter },
+    { username, role: u.role, label: u.label, hotelFilter: u.hotelFilter, staffProperty: u.staffProperty },
     JWT_SECRET,
     { expiresIn: TOKEN_TTL }
   );
@@ -82,14 +94,14 @@ app.post('/api/auth', (req, res) => {
   const { username, password } = req.body;
   const u = USERS[username];
   if (!u || u.pass !== password) return res.status(401).json({ error: 'Invalid credentials' });
-  res.json({ token: signUser(username, u), role: u.role, label: u.label, hotelFilter: u.hotelFilter });
+  res.json({ token: signUser(username, u), role: u.role, label: u.label, hotelFilter: u.hotelFilter, staffProperty: u.staffProperty });
 });
 
 // POST /api/auth/refresh — new token for a still-valid one (user must still exist)
 app.post('/api/auth/refresh', requireAuth, (req, res) => {
   const u = USERS[req.user.username];
   if (!u) return res.status(401).json({ error: 'Invalid token' });
-  res.json({ token: signUser(req.user.username, u), role: u.role, label: u.label, hotelFilter: u.hotelFilter });
+  res.json({ token: signUser(req.user.username, u), role: u.role, label: u.label, hotelFilter: u.hotelFilter, staffProperty: u.staffProperty });
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -99,12 +111,10 @@ app.post('/api/auth/refresh', requireAuth, (req, res) => {
 // GET /api/reservations
 app.get('/api/reservations', requireAuth, async (req, res) => {
   try {
-    const hotel = hotelFilter(req);
-    const conditions = ['trashed_at IS NULL'];
     const params = [];
-    if (hotel) { params.push(hotel); conditions.push(`hotel = $${params.length}`); }
+    const scope = resScope(req, params);
     const { rows } = await pool.query(
-      `SELECT * FROM reservations WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC`,
+      `SELECT * FROM reservations WHERE trashed_at IS NULL${scope} ORDER BY created_at DESC`,
       params
     );
     res.json(rows.map(dbToRes));
@@ -174,10 +184,17 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
     }
     if (!sets.length) return res.status(400).json({ error: 'No fields to update' });
 
-    if (hotel && 'hotel' in r && r.hotel !== hotel) return res.status(403).json({ error: 'Forbidden' });
+    if (hotel) {
+      // Hotel roles: a guest booking stays in their hotel; a staff booking stays in their property
+      const cur = await pool.query('SELECT property FROM reservations WHERE id = $1', [req.params.id]);
+      const isStaffRow = !!cur.rows[0]?.property;
+      if (isStaffRow  && 'property' in r && r.property !== req.user.staffProperty) return res.status(403).json({ error: 'Forbidden' });
+      if (!isStaffRow && 'hotel' in r && r.hotel !== hotel) return res.status(403).json({ error: 'Forbidden' });
+      if (!isStaffRow && 'property' in r && r.property) return res.status(403).json({ error: 'Forbidden' });
+    }
     params.push(req.params.id);
     const idIdx = params.length;
-    const scope = hotelScope(req, params);
+    const scope = resScope(req, params);
     const { rows } = await pool.query(
       `UPDATE reservations SET ${sets.join(', ')}, updated_at = NOW()
        WHERE id = $${idIdx}${scope} AND trashed_at IS NULL RETURNING *`,
@@ -192,7 +209,7 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
 app.delete('/api/reservations/:id', requireAuth, async (req, res) => {
   try {
     const params = [req.params.id];
-    const scope = hotelScope(req, params);
+    const scope = resScope(req, params);
     await pool.query(
       `UPDATE reservations SET trashed_at = NOW() WHERE id = $1${scope} AND trashed_at IS NULL`,
       params
@@ -205,7 +222,7 @@ app.delete('/api/reservations/:id', requireAuth, async (req, res) => {
 app.post('/api/reservations/confirm-all', requireAuth, async (req, res) => {
   try {
     const params = [];
-    const scope = hotelScope(req, params);
+    const scope = resScope(req, params);
     const { rowCount } = await pool.query(
       `UPDATE reservations SET status = 'confirmed', updated_at = NOW()
        WHERE status = 'pending' AND trashed_at IS NULL${scope}`,
@@ -306,11 +323,12 @@ app.delete('/api/cancellations', requireAuth, requireSuperadmin, async (req, res
 // GET /api/trash
 app.get('/api/trash', requireAuth, async (req, res) => {
   try {
-    const params = [];
-    const scope = hotelScope(req, params);
+    const rParams = [], cParams = [];
+    const rScope = resScope(req, rParams);
+    const cScope = hotelScope(req, cParams);
     const [res1, can1] = await Promise.all([
-      pool.query(`SELECT *, 'reservation' AS _trash_type FROM reservations WHERE trashed_at IS NOT NULL${scope} ORDER BY trashed_at DESC`, params),
-      pool.query(`SELECT *, 'cancellation' AS _trash_type FROM cancellations WHERE trashed_at IS NOT NULL${scope} ORDER BY trashed_at DESC`, params),
+      pool.query(`SELECT *, 'reservation' AS _trash_type FROM reservations WHERE trashed_at IS NOT NULL${rScope} ORDER BY trashed_at DESC`, rParams),
+      pool.query(`SELECT *, 'cancellation' AS _trash_type FROM cancellations WHERE trashed_at IS NOT NULL${cScope} ORDER BY trashed_at DESC`, cParams),
     ]);
     const items = [
       ...res1.rows.map(r => ({ ...dbToRes(r), _trashType: 'reservation', _trashedAt: r.trashed_at })),
@@ -326,7 +344,7 @@ app.post('/api/trash/:id/restore', requireAuth, async (req, res) => {
     const { type } = req.body; // 'reservation' | 'cancellation'
     const table = type === 'cancellation' ? 'cancellations' : 'reservations';
     const params = [req.params.id];
-    const scope = hotelScope(req, params);
+    const scope = table === 'reservations' ? resScope(req, params) : hotelScope(req, params);
     const { rows } = await pool.query(
       `UPDATE ${table} SET trashed_at = NULL WHERE id = $1${scope} RETURNING *`,
       params
@@ -342,7 +360,7 @@ app.delete('/api/trash/:id', requireAuth, async (req, res) => {
     const { type } = req.body;
     const table = type === 'cancellation' ? 'cancellations' : 'reservations';
     const params = [req.params.id];
-    const scope = hotelScope(req, params);
+    const scope = table === 'reservations' ? resScope(req, params) : hotelScope(req, params);
     await pool.query(`DELETE FROM ${table} WHERE id = $1${scope} AND trashed_at IS NOT NULL`, params);
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
@@ -351,11 +369,12 @@ app.delete('/api/trash/:id', requireAuth, async (req, res) => {
 // DELETE /api/trash  → empty trash
 app.delete('/api/trash', requireAuth, async (req, res) => {
   try {
-    const params = [];
-    const scope = hotelScope(req, params);
+    const rParams = [], cParams = [];
+    const rScope = resScope(req, rParams);
+    const cScope = hotelScope(req, cParams);
     await Promise.all([
-      pool.query(`DELETE FROM reservations WHERE trashed_at IS NOT NULL${scope}`, params),
-      pool.query(`DELETE FROM cancellations WHERE trashed_at IS NOT NULL${scope}`, params),
+      pool.query(`DELETE FROM reservations WHERE trashed_at IS NOT NULL${rScope}`, rParams),
+      pool.query(`DELETE FROM cancellations WHERE trashed_at IS NOT NULL${cScope}`, cParams),
     ]);
     res.json({ ok: true });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
