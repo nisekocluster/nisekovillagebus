@@ -88,6 +88,9 @@ body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .nav-item.active{color:var(--moss);border-left-color:var(--gold);background:rgba(26,63,168,.08);font-weight:500}
 .nav-item svg{flex-shrink:0;opacity:.6}
 .nav-item.active svg{opacity:1;color:var(--gold)}
+.nav-group-label{padding:16px 28px 4px;font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500;user-select:none}
+@media(min-width:901px){.nav-item.nav-sub{padding-left:34px}}
+@media(max-width:900px){.nav-group-label{display:none}}
 .nav-badge{position:absolute;right:20px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;letter-spacing:.04em;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;line-height:1}
 .sidebar-footer{padding:22px 24px;border-top:1px solid var(--border)}
 .logout-btn{width:100%;background:none;border:1px solid var(--border);color:var(--dim);padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.28em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px}
@@ -710,9 +713,18 @@ button,input,select,textarea{font:inherit}
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Dashboard
       </div>
-      <div class="nav-item" data-panel="reservations">
+      <div class="nav-item" data-panel="reservations" data-scope="all">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg>
+        All Reservations
+      </div>
+      <div class="nav-group-label">Reservations</div>
+      <div class="nav-item nav-sub" data-panel="reservations" data-scope="guest">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Reservations
+        GST Reservations
+      </div>
+      <div class="nav-item nav-sub" data-panel="reservations" data-scope="staff">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Staff Res
       </div>
       <div class="nav-item" data-panel="cancellations">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -1378,13 +1390,17 @@ function updateCancelBadge() {
 }
 
 /* ════ PANELS ════ */
+let resScope = 'all';   /* all | guest | staff — staff bookings carry a property */
+const RES_TITLES = { all:'All Reservations', guest:'GST Reservations', staff:'Staff Reservations' };
 const TITLES = { dashboard:'Dashboard', reservations:'Reservations', cancellations:'Cancellations', trash:'Trash', history:'Guest History', analytics:'Analytics', settings:'Settings' };
-function switchPanel(id) {
+function switchPanel(id, scope) {
+  if (id === 'reservations') resScope = scope || 'all';
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`panel-${id}`).classList.add('active');
-  document.querySelector(`.nav-item[data-panel="${id}"]`).classList.add('active');
-  document.getElementById('topbarTitle').textContent = TITLES[id] || id;
+  const navSel = id === 'reservations' ? `.nav-item[data-panel="reservations"][data-scope="${resScope}"]` : `.nav-item[data-panel="${id}"]`;
+  document.querySelector(navSel).classList.add('active');
+  document.getElementById('topbarTitle').textContent = id === 'reservations' ? RES_TITLES[resScope] : (TITLES[id] || id);
   if (id === 'reservations')  renderResTable();
   if (id === 'dashboard')     renderDashboard();
   if (id === 'cancellations') renderCancelTable();
@@ -1567,6 +1583,8 @@ function getFiltered() {
   return loadRes().filter(r => {
     const text = `${r.first} ${r.last} ${r.email} ${r.phone||''} ${r.reservationId||''} ${r.id}`.toLowerCase();
     if (q && !text.includes(q)) return false;
+    if (resScope === 'staff' && !r.property) return false;
+    if (resScope === 'guest' && r.property) return false;
     if (dir && r.dir !== dir) return false;
     if (status && (r.status||'pending') !== status) return false;
     if (selectedBuses.length && !selectedBuses.includes(r.bus)) return false;
@@ -1641,7 +1659,7 @@ function renderResTable() {
       return `<tr data-id="${r.id}" class="${isPending ? 'unread' : 'read-row'}" title="${isPending ? 'Unread — click to review and confirm' : 'Click to view details'}">
         <td><input type="checkbox" class="row-check" data-id="${r.id}"></td>
         <td class="td-mono" style="text-transform:uppercase">#${r.id||''}<br><span style="font-size:10px;color:var(--sage);text-transform:none">${(r.createdAt||'').slice(0,10)}</span>${r.source==='admin'&&r.createdBy?`<br><span style="font-size:10px;background:var(--moss);color:#fff;padding:1px 6px;border-radius:2px;letter-spacing:.06em;text-transform:none">Staff: ${r.createdBy}</span>`:''}</td>
-        <td class="td-name"><strong>${r.first} ${r.last}</strong><span>${r.email}</span>${r.phone?`<span>${r.phone}</span>`:''}${r.reservationId?`<span style="color:var(--gold);font-size:10px;letter-spacing:.06em">${r.property?'Staff ID':'ID'}: ${r.reservationId}</span>`:''}${r.property?`<span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:2px;letter-spacing:.06em;display:inline-block;margin-top:4px">${r.property}</span>`:''}</td>
+        <td class="td-name"><strong>${r.first} ${r.last}</strong><span>${r.email}</span>${r.phone?`<span>${r.phone}</span>`:''}${r.reservationId?`<span style="color:var(--gold);font-size:10px;letter-spacing:.06em">${r.property?'Staff ID':'Res ID'}: ${r.reservationId}</span>`:''}${r.property?`<span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:2px;letter-spacing:.06em;display:inline-block;margin-top:4px">${r.property}</span>`:''}</td>
         <td><span class="dir-badge">${r.dir==='arrival'?'✈ Arrival':'🏔 Departure'}</span></td>
         <td>${(()=>{ const b=busById(r.bus); return b ? `<span style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:22px;color:var(--moss);">${b.label}</span><span style="display:block;font-size:11px;color:var(--sage);letter-spacing:.06em;margin-top:1px;white-space:nowrap">${b.periodLabel}</span>` : `<span style="color:var(--sage)">${r.bus||'—'}</span>`; })()}</td>
         <td class="td-mono" style="white-space:nowrap">${r.date||'—'}</td>
@@ -2224,7 +2242,7 @@ function renderHistoryPanel(query) {
 document.getElementById('loginBtn').addEventListener('click', tryLogin);
 ['loginUser','loginPass'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); }));
 document.getElementById('logoutBtn').addEventListener('click', logout);
-document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => switchPanel(el.dataset.panel)));
+document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => switchPanel(el.dataset.panel, el.dataset.scope)));
 ['searchInput','filterDateFrom','filterDateTo'].forEach(id => { const el=document.getElementById(id); if(el) el.addEventListener('input', renderResTable); });
 document.getElementById('historySearchInput').addEventListener('input', () => renderHistoryPanel());
 
