@@ -1641,7 +1641,7 @@ function renderResTable() {
       return `<tr data-id="${r.id}" class="${isPending ? 'unread' : 'read-row'}" title="${isPending ? 'Unread — click to review and confirm' : 'Click to view details'}">
         <td><input type="checkbox" class="row-check" data-id="${r.id}"></td>
         <td class="td-mono" style="text-transform:uppercase">#${r.id||''}<br><span style="font-size:10px;color:var(--sage);text-transform:none">${(r.createdAt||'').slice(0,10)}</span>${r.source==='admin'&&r.createdBy?`<br><span style="font-size:10px;background:var(--moss);color:#fff;padding:1px 6px;border-radius:2px;letter-spacing:.06em;text-transform:none">Staff: ${r.createdBy}</span>`:''}</td>
-        <td class="td-name"><strong>${r.first} ${r.last}</strong><span>${r.email}</span>${r.phone?`<span>${r.phone}</span>`:''}${r.reservationId?`<span style="color:var(--gold);font-size:10px;letter-spacing:.06em">ID: ${r.reservationId}</span>`:''}</td>
+        <td class="td-name"><strong>${r.first} ${r.last}</strong><span>${r.email}</span>${r.phone?`<span>${r.phone}</span>`:''}${r.reservationId?`<span style="color:var(--gold);font-size:10px;letter-spacing:.06em">${r.property?'Staff ID':'ID'}: ${r.reservationId}</span>`:''}${r.property?`<span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:2px;letter-spacing:.06em;display:inline-block;margin-top:4px">${r.property}</span>`:''}</td>
         <td><span class="dir-badge">${r.dir==='arrival'?'✈ Arrival':'🏔 Departure'}</span></td>
         <td>${(()=>{ const b=busById(r.bus); return b ? `<span style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:22px;color:var(--moss);">${b.label}</span><span style="display:block;font-size:11px;color:var(--sage);letter-spacing:.06em;margin-top:1px;white-space:nowrap">${b.periodLabel}</span>` : `<span style="color:var(--sage)">${r.bus||'—'}</span>`; })()}</td>
         <td class="td-mono" style="white-space:nowrap">${r.date||'—'}</td>
@@ -1907,7 +1907,8 @@ function openResDetail(id) {
     `<div class="res-detail-block${cls}"><div class="res-detail-label">${label}</div><div class="res-detail-value${cls.includes('full') && !cls.includes('serif') ? '' : ''}">${value||'—'}</div></div>`;
 
   document.getElementById('rdGrid').innerHTML = [
-    r.reservationId ? field('Hotel Reservation ID', `<strong style="color:var(--gold)">${r.reservationId}</strong>`, ' full') : '',
+    r.property ? field('Property', `<strong style="color:var(--gold)">${r.property}</strong>`) : '',
+    r.reservationId ? field(r.property ? 'Staff ID' : 'Hotel Reservation ID', `<strong style="color:var(--gold)">${r.reservationId}</strong>`, r.property ? '' : ' full') : '',
     field('Guest Name', `<span style="font-family:\'Cormorant Garamond\',serif;font-size:19px;font-weight:500;color:var(--moss)">${r.first} ${r.last}</span>`),
     field('Email', `<a href="mailto:${r.email}" style="color:var(--moss);text-decoration:none">${r.email}</a>`),
     r.phone ? field('Phone', r.phone) : '',
@@ -2036,7 +2037,7 @@ document.getElementById('cancelDetailModal').addEventListener('click', e => { if
 function exportCSV() {
   const list = getFiltered();
   if (!list.length) { toast('No data to export.', 'err'); return; }
-  const headers = ['ID','Created','HotelReservationID','First','Last','Email','Phone','Guests','Luggage','GolfBags','Direction','Bus','BusPeriod','Date','Hotel','Flight','FlightType','Status','Notes'];
+  const headers = ['ID','Created','HotelReservationID','First','Last','Email','Phone','Guests','Luggage','GolfBags','Direction','Bus','BusPeriod','Date','Hotel','Flight','FlightType','Status','Notes','StaffProperty'];
   const rows = list.map(r => {
     const b = busById(r.bus);
     return [
@@ -2045,7 +2046,7 @@ function exportCSV() {
       r.guests||'', r.luggage||'', r.golfBags||'',
       r.dir, b ? b.label : (r.bus||''), b ? b.periodLabel : '',
       r.date||'', r.hotel||'', r.flight||'', r.flightType||'',
-      r.status||'pending', (r.notes||'').replace(/\n/g,' ')
+      r.status||'pending', (r.notes||'').replace(/\n/g,' '), r.property||''
     ].map(val => `"${String(val).replace(/"/g,'""')}"`).join(',');
   });
   const csv = [headers.join(','), ...rows].join('\n');
@@ -2527,7 +2528,7 @@ document.getElementById('resTableWrap').addEventListener('click', e => {
       expTr.className = 'expand-row';
       const cols = tr.querySelectorAll('td').length;
       const parts = [];
-      if (r?.reservationId) parts.push(`<span style="margin-right:20px"><span style="color:var(--sage);letter-spacing:.14em;text-transform:uppercase;font-size:9.5px">Hotel Res. ID</span> <strong style="color:var(--gold)">${r.reservationId}</strong></span>`);
+      if (r?.reservationId) parts.push(`<span style="margin-right:20px"><span style="color:var(--sage);letter-spacing:.14em;text-transform:uppercase;font-size:9.5px">${r.property?'Staff ID':'Hotel Res. ID'}</span> <strong style="color:var(--gold)">${r.reservationId}</strong></span>`);
       if (r?.flight) parts.push(`<span style="margin-right:20px"><span style="color:var(--sage);letter-spacing:.14em;text-transform:uppercase;font-size:9.5px">Flight</span> <strong>${r.flight}</strong>${r.flightType ? ` <span style="color:var(--sage);font-size:10px">(${r.flightType})</span>` : ''}</span>`);
       if (r?.luggage) parts.push(`<span style="margin-right:20px"><span style="color:var(--sage);letter-spacing:.14em;text-transform:uppercase;font-size:9.5px">Luggage</span> <strong>${r.luggage}</strong></span>`);
       if (r?.golfBags) parts.push(`<span style="margin-right:20px"><span style="color:var(--sage);letter-spacing:.14em;text-transform:uppercase;font-size:9.5px">Golf Bags</span> <strong>${r.golfBags}</strong></span>`);
