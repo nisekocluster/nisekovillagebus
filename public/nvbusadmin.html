@@ -720,11 +720,11 @@ button,input,select,textarea{font:inherit}
       <div class="nav-group-label">Reservations</div>
       <div class="nav-item nav-sub" data-panel="reservations" data-scope="guest">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        GST Reservations
+        Guest Reservations
       </div>
       <div class="nav-item nav-sub" data-panel="reservations" data-scope="staff">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Staff Res
+        Staff Reservations
       </div>
       <div class="nav-item" data-panel="cancellations">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -1391,7 +1391,7 @@ function updateCancelBadge() {
 
 /* ════ PANELS ════ */
 let resScope = 'all';   /* all | guest | staff — staff bookings carry a property */
-const RES_TITLES = { all:'All Reservations', guest:'GST Reservations', staff:'Staff Reservations' };
+const RES_TITLES = { all:'All Reservations', guest:'Guest Reservations', staff:'Staff Reservations' };
 const TITLES = { dashboard:'Dashboard', reservations:'Reservations', cancellations:'Cancellations', trash:'Trash', history:'Guest History', analytics:'Analytics', settings:'Settings' };
 function switchPanel(id, scope) {
   if (id === 'reservations') resScope = scope || 'all';
