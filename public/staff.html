@@ -898,6 +898,8 @@ main{max-width:1160px}.panel-head h2{font-size:clamp(40px,4.8vw,58px)}
 }
 /* TEST MODE banner */
 .test-mode-banner{position:fixed;right:0;bottom:0;z-index:99999;background:#b3261e;color:#fff;font:600 11px/1 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;pointer-events:none;opacity:.92}
+/* Wide screens: keep the hero text near the left edge instead of drifting to the centre */
+@media(min-width:1025px){.hero-content{max-width:none;margin:0;padding-left:clamp(56px,9vw,190px)}}
 </style>
 </head>
 <body>
