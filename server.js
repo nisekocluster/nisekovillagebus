@@ -5,6 +5,7 @@ const jwt      = require('jsonwebtoken');
 const cors     = require('cors');
 const path     = require('path');
 const fs       = require('fs');
+const mailer   = require('./mailer');
 
 const app  = express();
 const pool = new Pool({ 
@@ -148,6 +149,7 @@ app.post('/api/reservations', async (req, res) => {
         r.property || null,
       ]
     );
+    mailer.reservationReceived(rows[0]);
     res.status(201).json(dbToRes(rows[0]));
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
@@ -192,6 +194,10 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
       if (!isStaffRow && 'hotel' in r && r.hotel !== hotel) return res.status(403).json({ error: 'Forbidden' });
       if (!isStaffRow && 'property' in r && r.property) return res.status(403).json({ error: 'Forbidden' });
     }
+    // Previous status → email only when it really changes
+    const before = 'status' in r
+      ? (await pool.query('SELECT status FROM reservations WHERE id = $1', [req.params.id])).rows[0]?.status
+      : undefined;
     params.push(req.params.id);
     const idIdx = params.length;
     const scope = resScope(req, params);
@@ -201,6 +207,11 @@ app.patch('/api/reservations/:id', requireAuth, async (req, res) => {
       params
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    const after = rows[0].status;
+    if ('status' in r && after !== before) {
+      if (after === 'confirmed') mailer.reservationConfirmed(rows[0]);
+      if (after === 'cancelled') mailer.reservationCancelled(rows[0]);
+    }
     res.json(dbToRes(rows[0]));
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
@@ -223,11 +234,12 @@ app.post('/api/reservations/confirm-all', requireAuth, async (req, res) => {
   try {
     const params = [];
     const scope = resScope(req, params);
-    const { rowCount } = await pool.query(
+    const { rows, rowCount } = await pool.query(
       `UPDATE reservations SET status = 'confirmed', updated_at = NOW()
-       WHERE status = 'pending' AND trashed_at IS NULL${scope}`,
+       WHERE status = 'pending' AND trashed_at IS NULL${scope} RETURNING *`,
       params
     );
+    rows.forEach(mailer.reservationConfirmed);
     res.json({ confirmed: rowCount });
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
@@ -268,6 +280,7 @@ app.post('/api/cancellations', async (req, res) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7,'pending', NOW()) RETURNING *`,
       [r.ref, r.first, r.last, r.email, r.date, r.hotel || null, r.reason || null]
     );
+    mailer.cancellationRequested(rows[0]);
     res.status(201).json(dbToCancel(rows[0]));
   } catch (e) { console.error(e.message); res.status(500).json({ error: e.message }); }
 });
