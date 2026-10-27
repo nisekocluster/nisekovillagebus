@@ -19,23 +19,37 @@
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const MAIL_FROM      = process.env.MAIL_FROM || 'Niseko Village Bus <onboarding@resend.dev>';
-const MAIL_REPLY_TO  = process.env.MAIL_REPLY_TO || undefined;
 
-const list = v => (v || '').split(',').map(s => s.trim()).filter(Boolean);
+// Accepts "a@x.com, b@y.com", "a@x.com; b@y.com", quotes or spaces — keeps only valid addresses
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+function list(v, name) {
+  const parts = String(v || '').split(/[,;\s]+/).map(s => s.replace(/^mailto:/i, '').replace(/^["'<(\[]+|["'>)\].]+$/g, '')).filter(Boolean);
+  const bad = parts.filter(e => !EMAIL_RE.test(e));
+  if (bad.length && name) console.warn(`mail: ignoring invalid address(es) in ${name}: ${bad.join(' ')}`);
+  return parts.filter(e => EMAIL_RE.test(e));
+}
+const MAIL_REPLY_TO = list(process.env.MAIL_REPLY_TO, 'MAIL_REPLY_TO')[0];
+// Startup check — shows in the Railway log which version runs and what it understood
+const mask = a => a.replace(/^(.).*(@.*)$/, '$1***$2');
+console.log(`mail v2: key=${RESEND_API_KEY ? 'set' : 'MISSING'} · from=${MAIL_FROM} · reply_to=${MAIL_REPLY_TO ? mask(MAIL_REPLY_TO) : 'none'}`
+  + ` · team=${list(process.env.TEAM_EMAILS, 'TEAM_EMAILS').length} · moxy=${list(process.env.TEAM_EMAIL_MOXY, 'TEAM_EMAIL_MOXY').length}`
+  + ` · ritz=${list(process.env.TEAM_EMAIL_RITZ, 'TEAM_EMAIL_RITZ').length}`);
+if (/@(gmail|googlemail|yahoo|outlook|hotmail|icloud)\./i.test(MAIL_FROM))
+  console.warn('mail: MAIL_FROM uses a public mailbox domain — Resend only sends from your verified domain (e.g. bookings@nisekovillagebus.com)');
 
 // Each notice goes ONLY to its own team: guest bookings by hotel, staff bookings by property
 function teamRecipients(r) {
   const isMoxy = r.property ? r.property === 'Moxy Staff'         : r.hotel === 'Moxy';
   const isRitz = r.property ? r.property === 'Ritz Carlton Staff' : r.hotel === 'Ritz-Carlton Reserve';
-  const own = isMoxy ? list(process.env.TEAM_EMAIL_MOXY) : isRitz ? list(process.env.TEAM_EMAIL_RITZ) : [];
-  return own.length ? own : list(process.env.TEAM_EMAILS);
+  const own = isMoxy ? list(process.env.TEAM_EMAIL_MOXY, 'TEAM_EMAIL_MOXY') : isRitz ? list(process.env.TEAM_EMAIL_RITZ, 'TEAM_EMAIL_RITZ') : [];
+  return own.length ? own : list(process.env.TEAM_EMAILS, 'TEAM_EMAILS');
 }
 
 // Guest replies go ONLY to their own hotel: Moxy → Moxy, Ritz → Ritz, everyone else → MAIL_REPLY_TO
 function replyTo(r) {
   const isMoxy = r.property ? r.property === 'Moxy Staff'         : r.hotel === 'Moxy';
   const isRitz = r.property ? r.property === 'Ritz Carlton Staff' : r.hotel === 'Ritz-Carlton Reserve';
-  const own = isMoxy ? list(process.env.TEAM_EMAIL_MOXY) : isRitz ? list(process.env.TEAM_EMAIL_RITZ) : [];
+  const own = isMoxy ? list(process.env.TEAM_EMAIL_MOXY, 'TEAM_EMAIL_MOXY') : isRitz ? list(process.env.TEAM_EMAIL_RITZ, 'TEAM_EMAIL_RITZ') : [];
   return own.length ? own : (MAIL_REPLY_TO ? [MAIL_REPLY_TO] : undefined);
 }
 
@@ -168,7 +182,7 @@ async function send(to, { subject, html }, reply_to = MAIL_REPLY_TO) {
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: MAIL_FROM, to, subject, html, reply_to }),
   });
-  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()} (reply_to=${JSON.stringify(reply_to)})`);
 }
 
 // Fire-and-forget: an email problem must never break a booking or an admin action.
